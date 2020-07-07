@@ -1,0 +1,559 @@
+{% extends "base/base.html" %}
+{% block collapseCompras %}collapse show{% endblock collapseCompras %}
+{% block navmovimientos %}nav-item active{% endblock navmovimientos %}
+{% block facturas %}collapse-item active{% endblock facturas %}
+{% block pagecontent %}
+<div id="modal" class="container-fluid">
+    <h1 class="h3  text-gray-800"><i class="fa fa-plus-circle"></i>&nbsp;Nueva Venta</h1>
+    <div class="card-body">
+
+        <form method="post" id="formRow">
+
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-12  col-lg-8 pr-lg-1 pl-lg-1 p-0">
+                    <div class="card shadow bg-light mb-3">
+                        <div class="card-header bg-dark text-white"><i class="fas fa-dolly"></i>&nbsp;Seleccione
+                            producto
+                        </div>
+                        <div class="card-body">
+                            <input type="hidden" name="action" id="action" value="{{action}}">
+                            <div class="form-row">
+
+                                <div class="form-group col-lg-3">
+                                    <label for="">Código:</label>
+                                    <input type="text" name="codigo" id="codigo" class="form-control" readonly >
+                                </div>
+                                <div class="form-group col-lg-7 mt-1 mt-lg-0 col-12">
+                                    <label for="">Descripción:</label>
+
+                                    <input type="text" name="descripcion" id="descripcion" class="form-control"
+                                        placeholder="Escriba nombre del producto">
+                                </div>
+                                <div class="form-group col-lg-2 mt-lg-0 col-4">
+                                    <label for="" class="">Precio:&nbsp;&nbsp;</label>
+                                    <input type="number" name="precio" id="precio" readonly class="form-control">
+                                </div>
+
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-lg-3  col-4">
+                                    <label for="" class="">Descuento:&nbsp;&nbsp;</label>
+
+
+
+                                    <div class="input-group">
+
+                                        <input type="number" class="form-control" name="descuento_detalle"
+                                            id="descuento_detalle" aria-label="Amount (to the nearest dollar)">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-lg-2  col-4">
+                                    <label for="" class="">Cantidad:&nbsp;&nbsp;</label>
+                                    <input type="number" name="cantidad" id="cantidad" class="form-control ">
+
+                                </div>
+
+
+                                <div class="form-group col-lg-3 mt-1 mt-lg-0  col-12">
+                                    <label for="" class="" style="visibility: hidden;">Buscar</label>
+                                    <a href="#" class="btn btn-info btn-block" id="btnSearch"><i
+                                            class="fa fa-search-plus" aria-hidden="true"></i>&nbsp;Buscar</a>
+
+                                </div>
+                                <div class="form-group col-lg-3 mt-1 mt-lg-0  col-12">
+                                    <label for="" class="" style="visibility: hidden;">Buscar</label>
+                                    <a href="#" class="btn btn-danger  btn-block  btnAdd"><i
+                                            class="fas fa-cart-arrow-down"></i>&nbsp;Agregar</a>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="card shadow bg-light mb-3">
+                        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                            <div><i class="fas fa-th-list"></i>&nbsp;Lista de productos</div>
+                            <a href="#" class="btn btn-danger btnRemoveAll">
+                                <i class="fas fa-trash">&nbsp;Eliminar todo</i>
+                            </a>
+                        </div>
+                        <div class="card-body">
+
+                            <div class="table-responsive">
+                                <table class="table" id="tablaFacturaNew">
+                                    <thead>
+                                        <th class="all">Acciones</th>
+
+                                        <th>Cód.</th>
+                                        <th class="text-center">Descripción</th>
+                                        <th>Precio</th>
+                                        <th style="width: 7rem;">Cant.</th>
+                                        <th>SubTotal</th>
+                                    </thead>
+
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-4 pr-lg-1 pl-lg-1 p-0">
+                    <div class="card shadow bg-light mb-3">
+                        <div class="card-header bg-dark text-white"><i class="fas fa-edit"></i>&nbsp;Detalles de venta
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group col-lg-12">
+                                    <label for="" class="">N° Factura:</label>
+                                    <input type="text" name="enc_id" id="enc_id" readonly class="form-control"
+                                        value="{% if enc %}{{enc.id}}{% else %}{{obj.id}}{% endif %}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-lg-12 col-md-2"><label for="" class="">Fecha:</label></div>
+                                <div class="col-8 col-lg-12 col-md-5">
+                                    {{form.fecha}}
+
+                                </div>
+                            </div>
+
+                            <div class="form-group row ">
+                                <label for="" class="col-lg-12 col-md-12  col-sm-2 ">Cliente:</label>
+                                <div class="col-lg-12 col-sm-12">
+                                    <!-- <select name="enc_cliente" id="enc_cliente" style="width: 100%;"
+                                        class="form-control">
+                                        <option value="0">Seleccione cliente</option>
+                                        {% for item in clientes %}
+                                        <option value="{{item.id}}">{{item.nombres}} {{item.apellidos}}</option>
+                                        {% endfor %}
+                                    </select> -->
+                                    {{form.cliente}}
+                                </div>
+                            </div>
+
+                            <div class="form-group row ">
+
+                                <label for="" class=" col-4 col-lg-5 col-form-label ">SubTotal:</label>
+                                <div class="col-lg-7 col-8">
+                                    {{ form.sub_total }}
+
+                                </div>
+                            </div>
+                            <div class="form-group row">
+
+                                <label for="" class=" col-4 col-lg-5 col-form-label">Descuento:</label>
+                                <div class="col-8 col-lg-7">
+                                    {{ form.descuento }}
+                                </div>
+                            </div>
+                            <div class="form-group row">
+
+                                <label for="" class="col-4 col-lg-5 col-form-label">Total:</label>
+                                <div class="col-8 col-lg-7">
+                                    {{ form.total }}
+                                </div>
+                            </div>
+                            <div class="form-group mb-0">
+                                <button type="submit" class="btn btn-primary btn-block">Guardar factura</button>
+                                <a id="btncancel" href="{% url 'fac:facturacion_list' %}"
+                                    class="btn btn-secondary  btn-block">Cancelar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+
+
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+{% endblock pagecontent %}
+
+{% block js_page %}
+<script>
+    $("#sidebarToggle").click()
+    var tablaF
+    var vent = {
+        items: {
+            cliente: "",
+            fecha: "",
+            descuento: 0.00,
+            total: 0.00,
+            subtotal: 0.00,
+            products: [],
+        },
+        calculate: function () {
+            var subtotal = 0.00
+            var descuento = $("#descuento_detalle").val()
+            $.each(this.items.products, function (pos, dict) {
+                dict.sub_total = dict.cantidad * parseFloat(dict.precio)
+                subtotal += dict.sub_total;
+            });
+            this.items.subtotal = subtotal
+            this.items.descuento = descuento * 0.01 * this.items.subtotal
+            this.items.total = this.items.subtotal - this.items.descuento
+            $("#descuento").val(this.items.descuento.toFixed(2))
+
+            $("#sub_total").val(this.items.subtotal.toFixed(2))
+            $("#total").val(this.items.total.toFixed(2))
+
+        },
+        list: function () {
+            this.calculate()
+            tablaF = $('#tablaFacturaNew').DataTable({
+                "lengthMenu": [
+                    [5, 10, 25, 50, -1],
+                    [5, 10, 25, 50, "All"]
+                ],
+                responsive: true,
+                autoWidth: false,
+                destroy: true,
+                data: this.items.products,
+                columns: [{
+                        "data": "id"
+                    },
+                    {
+                        "data": "codigo"
+                    },
+                    {
+                        "data": "descripcion"
+                    },
+                    {
+                        "data": "precio"
+                    },
+                    {
+                        "data": "cantidad"
+                    },
+
+                    {
+                        "data": "sub_total"
+                    },
+
+
+
+                ],
+                columnDefs: [{
+                        targets: [0],
+                        class: 'text-center',
+                        orderable: false,
+                        render: function (data, type, row) {
+                            return '<a rel="remove" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a>';
+                        }
+                    },
+                    {
+                        targets: [-1],
+                        class: 'text-center',
+                        orderable: false,
+                        render: function (data, type, row) {
+                            return '$' + parseFloat(data).toFixed(2);
+                        }
+                    },
+                    {
+                        targets: [-2],
+                        class: 'text-center',
+                        orderable: false,
+                        render: function (data, type, row) {
+                            return '<input type="text" name="cant" class="form-control form-control-sm input-sm autocomplete="off" value="' +
+                                row.cantidad + '">';
+                        }
+                    },
+                    {
+                        targets: [-3],
+                        class: 'text-center',
+                        orderable: false,
+                        render: function (data, type, row) {
+                            return '$' + parseFloat(data).toFixed(2);
+                        }
+                    },
+                ],
+                rowCallback(row, data) {
+                    $(row).find("input[name='cant']").TouchSpin({
+                        buttondown_class: 'btn btn-secondary',
+
+                        buttonup_class: 'btn btn-secondary'
+                    });
+
+                },
+                initComplete: function (settings, json) {
+                    $("#tablaFacturaNew tbody").on("change keyup", "input[name='cant']", function (
+                        e) {
+                        e.preventDefault();
+                        var cant = parseInt($(this).val());
+                        var tr = tablaF.cell($(this).closest("td", "li")).index()
+                        vent.items.products[tr.row].cantidad = cant;
+                        vent.calculate()
+                        $("td:eq(5)", tablaF.row(tr.row).node()).html('$' + vent.items
+                            .products[tr.row].sub_total.toFixed(2))
+                    })
+                    $("a[rel='remove']").on("click", function () {
+                        var tr = tablaF.cell($(this).closest("td", "li")).index()
+                        confirmar("Confirmar", "¿Desea eliminar este producto de la lista?",
+                            function () {
+
+
+
+                                vent.items.products.splice(tr.row, 1)
+                                vent.list()
+                            })
+                    });
+                }
+            });
+        },
+    }
+
+    $(".btnAdd").click(function (event, ui) {
+        if ($("#descripcion").val() === "" || $("#codigo").val() === null) {
+            mensaje("Producto no seleccionado", "red", 1000);
+            return false;
+        } else {
+            let desc = $("#descripcion").val()
+            event.preventDefault();
+            $.ajax({
+                type: "POST",
+                url: "{%url 'fac:facturacion_new' %}",
+                data: {
+                    "action": "searchProduct",
+                    "term": desc,
+                    "cantidad": $("#cantidad").val(),
+
+
+                },
+                dataType: "json",
+                success: function (response) {
+                    if(response[0].stock===0){
+                        mensaje("No hay stock para este producto. Escoga otro e inténtelo nuevamente.","red",1500)
+                        vaciar()
+
+                        return false
+                    }
+                        vent.items.products.push(response[0])
+                        vent.list()
+                       
+                }
+            })
+        }
+    })
+
+    var searchproduct
+
+    $("#descuento_detalle").change(function (e) {
+        vent.calculate()
+
+    });
+
+    function buscarProducto() {
+        if ($("#enc_cliente").val() === "0" || $("#enc_cliente").val() === null) {
+            mensaje("Cliente no seleccionado", "red", 1200);
+            return false;
+        }
+        var codigo = $("#codigo").val()
+        if (codigo == "") {
+            return false;
+
+        }
+        var path = "{% url 'api:producto_list' %}" + codigo;
+        $.ajax({
+            type: "GET",
+            url: path,
+
+            success: function (response) {
+                if (response.stock <= 0 | !response.estado) {
+                    $("#codigo").val("")
+                    $("#descripcion").val("")
+                    $("#precio").val("0.00")
+                    $("#codigo").focus()
+                    return false
+                }
+                $("#codigo").val(response.codigo)
+                $("#descripcion").val(response.descripcion)
+                $("#precio").val(response.precio)
+                $("#cantidad").focus()
+
+            },
+            error: function (a, b, c) {
+                if (a.status == 404) {
+                    mensaje("Producto -" + codigo + " - No encontrado o no existe", "red", "1500")
+                    $("#codigo").val("")
+                    $("#descripcion").val("")
+                    $("#precio").val("0.00")
+                    $("#codigo").focus()
+                }
+            }
+        });
+
+    }
+    $('#enc_cliente').select2({
+        language: "es",
+        placeholder: "Seleccione cliente",
+        allowClear: true,
+        dropdownParent: $('#modal'),
+        selectionCssClass: "form-control",
+        dropdownAutoWidth: "true",
+        width: 'resolve',
+
+
+    });
+
+    $("input[name='descripcion']").autocomplete({
+        source: function (request, response) {
+
+            $.ajax({
+                type: "POST",
+                url:"{% url 'fac:facturacion_new' %}",
+                data: {
+                    "action": "searchProduct",
+                    "term": request.term,
+                    "cantidad": $("#cantidad").val(),
+
+                },
+                dataType: "json",
+
+            }).done(function (data) {
+                response(data);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert(textStatus + ': ' + errorThrown);
+            }).always(function (data) {
+
+            });;
+        },
+        delay: 0,
+        minLength: 1,
+        select: function (event, ui) {
+
+            console.log(ui.item)
+            $("#codigo").val(ui.item.codigo)
+            $("#precio").val(ui.item.precio)
+            $("#cantidad").val(1)
+
+        }
+    }).on("keyup", function () {
+        $("#codigo").val("")
+        $("#precio").val("")
+        $("#cantidad").val(0)
+
+    })
+    $(".btnRemoveAll").click(function (e) {
+        e.preventDefault()
+        if (vent.items.products.length === 0) {
+            return false
+
+        } else {
+            confirmar("Confirmar", "¿Desea eliminar los productos seleccionados?", function () {
+                vent.items.products = []
+                vent.list()
+            })
+
+        }
+
+    });
+    $("#formRow").on("submit", function (e) {
+        e.preventDefault()
+        if (vent.items.products.length === 0) {
+            mensaje("Debe ingresar al menos un producto", "red", 1200)
+            return false;
+        }
+        vent.items.cliente = $("#enc_cliente").val();
+        vent.items.fecha = $("#fecha").val();
+        var parameters = new FormData(this);
+        parameters.append('action', $('input[name="action"]').val());
+        parameters.append("vents", JSON.stringify(vent.items))
+        $.ajax({
+            type: "POST",
+            url: window.location.pathname,
+            data: parameters,
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                console.log(response)
+                if(response["mensaje"]=="guardado"){
+                 mensaje("¡Factura registrada!","green",3000)
+                }
+                else
+                    if(response["mensaje"]=="editado"){
+                        mensaje("¡Factura editada!","green",3000)
+
+                    }
+
+                    
+            }
+        }).done(function (data) {
+            
+            setTimeout(function(){location.href = '{% url "fac:facturacion_list"%}';},3000);
+
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            alert("done:" + textStatus + ': ' + errorThrown);
+        }).always(function (data) {
+
+        });;
+
+    });
+    $("#btnSearch").click(function (e) {
+        if ($("#enc_cliente").val() === "0") {
+            mensaje("Cliente no seleccionado", "red", 1200);
+            return false;
+        }
+        e.preventDefault();
+        searchproduct = $.confirm({
+            title: 'Buscar Producto+',
+            icon: "fa fa-search-plus",
+            type: "blue",
+            containerFluid: true,
+            content: "URL:{% url 'fac:searchProduct'%}",
+            theme: "material",
+            columnClass: 'col-md-12 col-lg-8',
+
+            containerFluid: true,
+            buttons: {
+
+                cancel: function () {},
+            }
+        });
+
+    });
+    $("#codigo").keypress(function (e) {
+        if (e.keyCode === 13) {
+            e.preventDefault();
+            buscarProducto();
+        }
+    });
+    function vaciar(){
+        $("#codigo").val("")
+        $("#descripcion").val("")
+        $("#precio").val("")
+        $("#cantidad").val(0)
+        $("#descuento_detalle").val("")
+
+    }
+    $("#cantidad").TouchSpin({
+        verticalbuttons: true,
+        initval: 0,
+        buttondown_class: 'btn btn-secondary',
+
+        buttonup_class: 'btn btn-secondary'
+    });
+        {%if det %}
+             vent.items.products={{ det|safe }}
+        {%endif%}
+    vent.list()
+    // $("#cantidad,#precio,#descuento_detalle").change(function (e) {
+    //     calcular_Detalle()
+    // });
+    // $("#enc_cliente").val("{{enc.cliente.id}}").change()
+    // $("#sub_total").val({{enc.sub_total}})
+    // $("#descuento").val({{enc.descuento}})
+    // $("#total").val({{enc.total}})
+</script>
+{% endblock js_page %}

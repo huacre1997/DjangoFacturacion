@@ -1,0 +1,58 @@
+<div class="container-fluid">
+<div class="card">
+    <div class="card-body">
+        <div class="row no-gutters align-items-center">
+            <div class="col">
+                    <table class="table  table-hover" id="tablaSearch" style="width: 100%;">
+                        <thead>
+                            <th>Código</th>
+                            <th>Cod.barra</th>
+                            <th>Descripción</th>
+                            <th>Stock</th>
+                            <th>Precio</th>
+                            <th class="all">Acciones</th>
+                        </thead>
+                        <tbody>
+                            {% for item in obj %}
+                              <tr>
+                                  <td>{{item.codigo}}</td>
+                                  <td>{{item.codigo_barra}}</td>
+                                  <td>{{item.descripcion}}</td>
+                                  <td>{{item.stock}}</td>
+                                  <td>{{item.precio}}</td>
+                                    <td>
+                                        <button onclick="seleccionarProducto({{item.id}},'{{item.codigo}}','{{item.descripcion}}',{{item.precio}})" class="btn btn-warning" id="btnselect"><i class="far fa-hand-pointer"></i></button>
+                                    </td>
+                              </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+            
+            </div>
+        </div>   
+    </div>
+</div>
+</div>
+{% block js_page %}
+  <script>
+      $(document).ready(function () {
+          $("#tablaSearch").DataTable({
+            "lengthMenu": [
+                    [5, 10, 25, 50, -1],
+                    [5, 10, 25, 50, "All"]
+                ],
+          })
+      });
+   function seleccionarProducto(id,codigo,descripcion,precio){
+       $("#codigo").val(codigo)
+        $("#precio").val(precio)
+        $("#cantidad").val(1)
+
+        $("#descripcion").val(descripcion)
+        searchproduct.close() 
+        $("#codigo").select()
+        $("#codigo").focus()
+
+   }
+  </script>
+{% endblock js_page %}

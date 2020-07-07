@@ -1,0 +1,84 @@
+{% extends "base/base.html" %}
+{% block collapse %}collapse show{% endblock collapse %}
+{% block navcatalogo %}nav-item active{% endblock navcatalogo %}
+
+{% block producto %}collapse-item active{% endblock producto %}
+{% block pagecontent %}
+<div class="container-fluid">
+<div class="card shadow mb-4">
+    <!-- Card Header - Dropdown -->
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+      <h6 class="m-0 font-weight-bold text-primary">Listado de Productos</h6>
+      <div class="dropdown no-arrow">
+        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+        </a>
+        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+          <div class="dropdown-header">Acciones</div>
+          <a class="dropdown-item" onclick="return abrir_modal('{% url 'inv:product_new' %}')" href="#"><i class="far fa-calendar-plus"></i>&nbsp;Nuevo producto</a>
+          <a class="dropdown-item" href="#">Another action</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="#">Something else here</a>
+        </div>
+      </div>
+    </div>
+    <!-- Card Body -->
+    <div class="card-body">
+    
+        
+        <table class="table tabled-striped table-hover">
+            <thead>
+                <th>Sub.Cat.</th>
+                <th>Código</th>
+                <th>Barra</th>
+                <th>Descripción</th>
+                <th>Existencia</th>
+                <th>Marca</th>
+                <th>Estado</th>
+
+                <th class="all">Acciones</th>
+            </thead>
+            <tbody>
+           
+                {% for item in obj  %}
+                <tr>
+                    <td>{{item.subcategoria}}</td>
+                    <td>{{item.codigo}}</td>
+                    <td>{{item.codigo_barra}}</td>
+                    <td>{{item.descripcion}}</td>
+                    <td>{{item.stock}}</td>
+                    <td>{{item.marca}}</td>
+                    <td>{{item.estado|yesno:"Activo,Inactivo"}}</td>
+                
+                    <td>
+                        <a href="#" onclick="return abrir_modal('{% url 'inv:product_edit' item.id %}')" class="btn btn-warning btn-circle" role="button"><i class="far fa-edit"></i></a>
+                        <a  href="{% url 'inv:product_inactive' item.id %}" class="btn btn-danger btn-circle" role="button"><i class="far fa-trash-alt"></i></a>
+
+                    </td>
+                  </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+  </div>
+</div>
+{% endblock pagecontent %}
+{% block js_page %}
+  <script>
+    $(document).ready(function () {
+      $(".table").DataTable({
+        "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+        "language":{
+          "sSearch":"Buscar",
+          "emptyTable":"No hay datos disponibles para esta tabla",
+          "lengthMenu":"Mostrando _MENU_ entradas",
+          "loadingRecords":"Cargando...",
+          "processing":"Procesando...",             
+          "zeroRecords":"No se encontraron resultados",
+          "infoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 entradas",
+
+        }
+      });
+    });
+  </script>
+{% endblock js_page %}

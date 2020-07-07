@@ -1,0 +1,90 @@
+<div class="container-fluid">
+        <div class="card-body">
+            <div class="row no-gutters align-items-center">
+                <div class="col">
+                    {% for item in enc  %}
+                    <div class="row">
+                        <label class="col-form-label col-lg-2">Cliente:</label>
+                        <input type="text" class="col-lg-5 form-control" readonly value="{{item.cliente}}">
+                        <label class="col-form-label col-lg-2">Fecha:</label>
+                        <input type="text" class="col-lg-3 form-control" readonly value="{{item.fecha}}">
+                    </div>
+                    {%endfor%}
+                    <table class="table  table-hover " id="tablaDetail" style="width: 100%;">
+                        <thead>
+                            <th>Cod.</th>
+                            <th >Descripcion</th>
+                            <th>Precio</th>
+                            <th>Cant.</th>
+                            <th>SubTotal</th>
+                        </thead>
+                        <tbody>
+                            {% for item in data %}
+                            <tr>
+                                <td>{{item.producto.id}}</td>
+
+                                <td>{{item.producto.descripcion}}</td>
+
+                                <td class="text-center">{{item.precio}}</td>
+                                <td class="text-center">{{item.cantidad}}</td>
+                                <td class="text-center">{{item.sub_total}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <hr>
+                    {% for item in enc  %}
+                  
+                    <div class="form-group row">
+                        <label class="col-form-label col-lg-2 offset-lg-8">SubTotal:</label>
+                        <input type="text" class="col-lg-2 form-control" readonly value="{{item.sub_total}}">
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label col-lg-2 offset-lg-8">Descuento:</label>
+                        <input type="text" class="col-lg-2 form-control" readonly value="{{item.descuento}}">
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label col-lg-2 offset-lg-8">Total:</label>
+                        <input type="text" class="col-lg-2 form-control" readonly value="{{item.total}}">
+                    </div>
+                       
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+</div>
+{% block js_page %}
+<script>
+    $(document).ready(function () {
+        $("#tablaDetail").DataTable({
+            "lengthMenu": [
+                [5, 10, 25, 50, -1],
+                [5, 10, 25, 50, "All"]
+            ],
+            "info": false,
+            searching:false,
+            paging:false,
+            autoWidth: true,
+            destroy: true,
+            responsive:true,
+            columnDefs: [{
+                    targets: [-1],
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '$' + parseFloat(data).toFixed(2);
+                    }
+                },
+
+                {
+                    targets: [-3],
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '$' + parseFloat(data).toFixed(2);
+                    }
+                },
+            ],
+        })
+    });
+</script>
+{% endblock js_page %}

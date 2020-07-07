@@ -1,0 +1,120 @@
+{% if obj %}
+<form method="POST" id="form" class="needs-validation" novalidate>
+
+  {% else %}
+  <form method="POST" id="form" class="needs-validation" novalidate>
+
+    {% endif %}
+
+    <style>
+      .form-group {
+        margin-bottom: 0;
+      }
+    </style>
+    {% csrf_token %}
+    <input type="hidden" value="{% if obj %}edit{% else %}add{% endif %}" name="action">
+    <div class="card-body" style="padding:0 1rem;">
+      <div class="form-group">
+        <label for="nombres" class="col-form-label">Nombres:</label>
+        <input value="{% if obj %}{{obj.nombres}}{% endif %}" type="text" name="nombres" id="id_nombres"
+          class="{% if form.errors.nombres %}form-control is-invalid{% else %}form-control{% endif %} " required>
+
+        <div class="invalid-feedback">
+          {% if form.errors.nombres %}
+          {% for error in form.nombres.errors %}
+          {{ error }}
+          {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+
+
+      <div class="form-group">
+        <label for="apellidos" class="col-form-label">Apellidos:</label>
+        <input value="{% if obj %}{{obj.apellidos}}{% endif %}" type="text" name="apellidos" id="id_apellidos"
+          class="{% if form.errors.apellidos %}form-control is-invalid{% else %}form-control{% endif %} " required>
+        <div class="invalid-feedback">
+          {% if form.errors.apellidos %}
+          {% for error in form.apellidos.errors %}
+          {{ error }}
+          {% endfor %}
+          {% endif %}
+
+        </div>
+
+
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+
+          <label for="tipo" class="col-form-label">Tipo:</label>
+          {{form.tipo}}
+        </div>
+        <div class="form-group col-md-6">
+
+          <label for="celular" class="col-form-label">Celular:</label>
+          <input value="{% if obj %}{{obj.celular}}{% endif %}" type="text" name="celular" id="id_celular"
+            class="{% if form.errors.celular %}form-control is-invalid{% else %}form-control{% endif %} " required>
+          <div class="invalid-feedback">
+            {% if form.errors.celular %}
+            {% for error in form.celular.errors %}
+            {{ error }}
+            {% endfor %}
+            {% endif %}
+
+
+          </div>
+        </div>
+
+      </div>
+      <div class="form-group">
+        <label for="estado" class="col-form-label">Estado:</label>
+        {{form.estado}}
+      </div>
+
+    </div>
+    <input type="hidden" value="{{user.id}}" name="createdUsu">
+    <input type="hidden" value="{{obj.pk}}" id="id">
+    <button type="submit" class="btn btn-primary" id="btnEdit" style="display:none">Submit</button>
+
+  </form>
+
+  {% block js_page %}
+  <script>
+    $("#form").on("submit", function (e) {
+      var id = $("#id").val()
+      var nombre = $("#id_nombres").val()
+      var apellido = $("#id_apellidos").val()
+      var celular = $("#id_celular").val()
+      $.ajax({
+        type: "POST",
+        url: "edit/" + id + "/",
+        data: $('#form').serialize(),
+        dataType: "json",
+        success: function (data) {
+          if (data["stat"] == "ok") {
+            de.close()
+            mensaje("Cliente editado exitosamente.")
+          } else {
+            $("#form").html($(data["form"]).html())
+            $("#id ").val(id)
+
+            $("#id_nombres").val(nombre)
+            $("#id_apellidos").val(apellido)
+            $("#id_celular ").val(celular)
+            $(":text").keypress(function (e) {
+              $(this).removeClass("is-invalid")
+            });
+          }
+          tabla.ajax.reload()
+        }
+      }).done(function (data) {}).fail(function (jqXHR, textStatus, errorThrown) {
+                alert("done:" + textStatus + ': ' + errorThrown);
+              }).always(function (data) {
+
+              });;
+              return false;
+    });
+  </script>
+
+  {% endblock js_page %}

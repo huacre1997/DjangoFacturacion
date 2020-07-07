@@ -1,0 +1,109 @@
+<div class="modal-dialog modal-sm">
+    <div class="modal-content">
+        <form method="POST" class="form-inline">
+            {% csrf_token %}
+            <div class="col">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col-9">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                    <div class="alert">
+                                        {% if obj.estado %}
+                                        ¿Inactivar {{obj.descripcion}}?
+
+                                        {% else %}
+                                        ¿Activar {{obj.descripcion}}?
+
+                                        {% endif %}
+                                        
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-3">
+                                <i class="fas fa-question-circle fa-2x text-gray-300"></i>
+                            </div>
+                            <div class="row">
+                                {% if obj.estado %}
+                                <button type="button" id="btnInactivar" class="btn btn-danger"> <i
+                                    class="fas fa-question-circle"></i>Si,
+                                inactivar</button>
+
+                                {% else %}
+                                <button type="button" id="btnActivar" class="btn btn-danger"> <i
+                                    class="fas fa-question-circle"></i>Si,
+                                Activar</button>
+
+                                {% endif %}
+                                
+                              
+                                <button type="button" class="btn btn-success"
+                                    onclick="return cerrar_modal()">No,cancelar</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        var token = $("input[name=csrfmiddlewaretoken]").val();
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!(/^http:.*/.test(settings.url) || /^http:.*/.test(settings.url))) {
+                    xhr.setRequestHeader("X-CSRFToken", token);
+                }
+            }
+        });
+        $("#btnInactivar").click(function (e) {
+            e.preventDefault()
+            var id = {{obj.id}}
+            var template = "{% url 'cmp:proveedor_inactive' obj.id %}"
+            var data = { "id": id }
+            data = JSON.stringify(data)
+
+            $.ajax({
+                type: "POST",
+                url: template,
+                data: data,
+            
+                success: function (response) {
+                    cerrar_modal()
+                    $("#tablaProv").empty()
+                    $("#tablaProv").html($(response).find("#tablaProv").html())
+
+                }
+                
+
+            });//ajax
+
+        });
+        $("#btnActivar").click(function (e) {
+            e.preventDefault()
+            var id = {{obj.id}}
+            var template = "active/"+id,
+            var data = { "id": id },
+            data = JSON.stringify(data)
+
+            $.ajax({
+                type: "POST",
+                url: template,
+                data: data,
+            
+                success: function (response) {
+                    cerrar_modal()
+                    $("#tablaProv").empty()
+                    $("#tablaProv").html($(response).find("#tablaProv").html())
+
+                }
+                
+
+            });//ajax
+
+        });//click
+    });
+</script>

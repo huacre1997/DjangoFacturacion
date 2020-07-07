@@ -1,0 +1,274 @@
+{% extends "base/base.html" %}
+{% block collapseCompras %}collapse show{% endblock collapseCompras %}
+{% block navmovimientos %}nav-item active{% endblock navmovimientos %}
+{% block facturas %}collapse-item active{% endblock facturas %}
+{% block pagecontent %}
+<div class="container-fluid">
+  <style>
+    .middle {
+      vertical-align: middle !important;
+    }
+
+    .btn-info:focus {
+      background-color: #17a2b8;
+      border-color: #17a2b8;
+      ;
+    }
+
+    .btn:focus,
+    .btn:active {
+      outline: none !important;
+      box-shadow: none !important;
+
+    }
+  </style>
+  <div class="card shadow">
+    <!-- Card Header - Dropdown -->
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+      <h6 class="m-0 font-weight-bold text-primary">Listado de Clientes</h6>
+      <a class="btn btn-primary btnNew" href="{% url 'fac:facturacion_new' %}"><i
+          class="fa fa-plus-circle "></i>&nbsp;Nueva venta</a>
+    </div>
+    <!-- Card Body -->
+    <div class="card-body">
+
+      <table class="table  table-hover dt-responsive" id="tablaFac" style="width: 100%;">
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th class="text-center">Cliente</th>
+            <th>Fecha</th>
+            <th>SubTotal</th>
+            <th>Desc.</th>
+            <th>Total</th>
+
+            <th class="all">Acciones</th>
+          </tr>
+
+
+        </thead>
+        <!-- <tbody>
+          {% if obj %}
+          {% for item in obj %}
+
+          <tr>
+              
+            <td>{{item.id}}</td>
+            <td>{{item.cliente}}</td>
+            <td>{{item.fecha}}</td>
+
+            <td>{{item.total}}</td>
+            <td>{{item.estado|yesno:"Activo,Inactivo"}}</td>
+            <td>
+              <a href="{% url 'fac:facturacion_edit' item.id %}" class="btn btn-warning"><i class="far fa-edit"></i></a>
+            </td>
+
+          </tr>
+          {% endfor %}
+
+          {% endif %}
+
+        </tbody> -->
+
+
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-info ">
+        <h5 class="modal-title" id="exampleModalLongTitle"><i class="fas fa-shopping-cart"></i>&nbsp;Detalles de venta</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      </div>
+     
+    </div>
+  </div>
+</div>
+{% endblock pagecontent %}
+{% block js_page %}
+<script>
+  var nani
+
+  $(document).ready(function () {
+    tabla = $("#tablaFac").DataTable({
+      responsive: true,
+      processing: true,
+      ajax: {
+        url: "{%url 'api:factura_list'%}",
+
+        dataSrc: ""
+      },
+      "lengthMenu": [
+        [5, 10, 25, 50, -1],
+        [5, 10, 25, 50, "All"]
+      ],
+      "language": {
+        "sSearch": "Buscar",
+        "emptyTable": "No hay datos disponibles para esta tabla",
+        "lengthMenu": "Mostrando _MENU_ entradas",
+        "loadingRecords": "Cargando...",
+        "processing": '<div class="spinner-border text-primary" style="width: 3rem; height: 3rem; role="status"><span class="sr-only">Loading...</span></div>',
+        "zeroRecords": "No se encontraron resultados",
+        "info": "Mostrando _START_ al _END_ de _TOTAL_ entradas",
+        "infoEmpty": "Mostrando 0 al 0 de 0 entradas",
+
+
+      },
+      "order": [
+        [0, 'asc']
+      ],
+      columns: [{
+          "data": 'id',
+          className: "text-center middle",
+        },
+        {
+          "data": 'cliente.nombres',
+          className: "middle",
+
+        },
+        {
+          "data": 'fc',
+          className: "middle"
+        },
+        {
+          "data": 'sub_total',
+          className: "text-center middle"
+        },
+        {
+          "data": 'descuento',
+          className: "text-center middle"
+        },
+        {
+          "data": 'total',
+          className: "text-center middle"
+        },
+       
+        {
+          "data": null,
+          className: "text-center middle"
+        },
+
+
+      ],
+      columnDefs: [{
+          targets: [-1],
+
+          render: function (row, data, index) {
+            var buttons =
+              '<a  href="#" rel="details" class="btn btn-info mr-1" role="button"><i class="fas fa-search" ></i></a>'
+              buttons+='<a class="btn btn-warning  mr-1" href="edit/'+row.id+'" ><i class="far fa-edit"></i></a>';
+              buttons+='<a class="btn btn-success" href="#"><i class="fas fa-thumbs-up"></i></a>';
+
+            return buttons;
+
+          },
+
+
+        },
+
+        {
+          "targets": 1,
+          "render": function (data, type, row) {
+            return row.cliente.apellidos + ' ' + row.cliente.nombres;
+          }
+        }
+      ],
+      "createdRow": function (row, data, index) {
+        if (!data["estado"]) {
+          $('.btn-success', row).eq(0).removeClass().addClass("btn btn-danger btn-circle")
+          $(".fa-thumbs-up", row).eq(0).removeClass().addClass("fas fa-thumbs-down")
+
+        }
+      },
+      initComplete: function (settings, json) {
+        $(document).on("click", "a[rel='details']", function (e) {
+          e.preventDefault()
+          var tr = tabla.cell($(this).closest("td", "li")).index()
+          var data = tabla.row(tr.row).data()
+         $("#exampleModalCenter").modal("show")
+          
+
+          $.ajax({
+                url: '{% url "fac:facturaDetail" %}',
+                data: {
+                  "action": "search_details",
+                  "id": data.id
+                },
+                method: 'POST',
+                success:function(response){
+                 
+                  $(".modal-body").html(response)
+                }
+              }).done(function (data) {}).fail(function (jqXHR, textStatus, errorThrown) {
+                alert("done:" + textStatus + ': ' + errorThrown);
+              }).always(function (data) {
+
+              });;
+            
+      
+          
+
+        });
+      },
+
+    });
+
+    // $(".btnNew").click(function (e) {
+    //   e.preventDefault();
+    //   var url=$(this).attr("data-url")
+    //   nani = $.confirm({
+    //     title: 'Nueva Venta',
+    //     content: function () {
+    //       var self = this;
+    //     return $.ajax({
+    //         type: "GET",
+    //         url: url,
+    //         success: function (response) {
+    //           self.setContent(response)
+    //         }
+    //       });
+    //     },
+    //     icon: "fa fa-plus-circle",
+    //     type: "blue",
+    //     containerFluid: true, // this will add 'container-fluid' instead of 'container'
+
+    //     columnClass: 'col-lg-12 col-md-12 col-sm-12  col-xs-12 ',
+    //     buttons: {
+
+    //       confirm: {
+    //         text: 'Guardar',
+    //         btnClass: 'btn-blue',
+    //         action: function () {
+    //           return false;
+    //         }
+    //       },
+    //       somethingElse2: {
+    //         text: 'Imprimir',
+    //         btnClass: 'btn-green',
+    //         action: function () {}
+    //       },
+    //       cancel: function () {},
+
+    //     },
+    //     onContentReady: function () {
+    //       $(".jconfirm-buttons>.btn-blue").prepend("<i class='fas fa-save'></i>&nbsp;")
+    //       $(".jconfirm-buttons>.btn-green").prepend("<i class='fas fa-print'></i>&nbsp;")
+    //       $(".jconfirm-buttons>.btn-default").prepend("<i class='fas fa-times'></i>&nbsp;")
+    //       nani.$el.find('.jconfirm-scrollpane').css('display', 'block');
+    //       nani.$el.find('.jconfirm-row').css('display', 'block');
+    //       nani.$el.find('.jconfirm-cell').css('display', 'block');
+    //     },
+    //   });
+    // });
+
+  });
+</script>
+{% endblock js_page %}

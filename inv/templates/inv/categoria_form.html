@@ -1,0 +1,87 @@
+{% extends "base/base.html" %}
+{% block pagecontent %}
+{% if obj %}
+<form method="POST" >
+
+  {% else %}
+  <form method="POST" class="needs-validation" novalidate id="form">
+
+    {% endif %}
+
+  {% csrf_token %}
+  <div class="card-body">
+    <div class="form-row">
+      <div class="col-md-4 mb-3 name-group">
+        <label class="form-check-label" for="id_description"> Descripcion </label>
+        <input type="text" name="description" id="id_description" class="form-control" id="validationCustom03"  value=" {% if obj %} {{obj.description}}{% endif %}" required>
+        <div class="invalid-feedback">
+          {% if form.errors %}
+          {% for field in form %}
+          {% for error in field.errors %}
+          {{ error }}
+          {% endfor %}
+          {% endfor %}
+          {% endif %}
+
+        </div>
+      </div>
+    
+    </div>
+
+    <div class="form-group">
+      <div class="form-check">
+        <input type="checkbox" class="form-check-input" name="estado" id="id_estado" {% if obj %} checked {%endif%}>
+        <label class="form-check-label" for="invalidCheck">
+          Estado
+        </label>
+        <div class="invalid-feedback">
+          You must agree before submitting.
+        </div>
+      </div>
+    </div>
+<button type="submit" class="btn btn-primary">Submit</button>  </div>
+
+</form>
+
+{% endblock pagecontent %}
+{% block js_page %}
+<script>
+  // Example starter JavaScript for disabling form submissions if there are invalid fields
+
+  // Fetch all the forms we want to apply custom Bootstrap validation styles to
+  // Loop over them and prevent submission
+ 
+  
+  $("#form").on("submit",function (e) {
+    e.preventDefault()
+    var des=$("#id_description").val()
+    $.ajax({  
+      type: 'POST',
+      url: "{% url 'inv:categoria_new' %}",
+      data: $("#form").serialize(),
+      success: function (data, status) {
+        console.log(status)
+        console.log($(data).find("#form").html())
+
+        if (data['stat'] == "ok") {
+          window.location.href = "{% url 'inv:categoria_list' %}"; 
+
+        } else {
+          console.log("error")
+          $("#form").empty()
+          $("#form").html($(data).find("#form").html())
+          $("#id_description").addClass("is-invalid")
+          $("#id_description").val(des)
+          $("#id_description").keypress(function (e) { 
+          $("#id_description").removeClass("is-invalid")
+
+  });
+  
+
+        }
+      }
+    });
+  });
+</script>
+
+{% endblock js_page %}

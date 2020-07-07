@@ -1,0 +1,226 @@
+{% extends "base/base.html" %}
+{% block collapse %}collapse show{% endblock collapse %}
+{% block proveedor %}collapse-item active{% endblock proveedor %}
+{% block navcatalogo %}nav-item active{% endblock navcatalogo %}
+{% block pagecontent %}
+<style>
+  .btn:focus,
+  .btn:active {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+</style>
+<div class="card shadow mb-4">
+  <!-- Card Header - Dropdown -->
+  <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+    <h6 class="m-0 font-weight-bold text-primary">Listado de Proveedores</h6>
+    <div class="dropdown no-arrow">
+      <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
+        aria-haspopup="true" aria-expanded="false">
+        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+      </a>
+      <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+        <div class="dropdown-header">Acciones</div>
+        <a class="dropdown-item" onclick="return abrir_modal('{% url 'cmp:proveedor_new' %}')" href="#"><i
+            class="far fa-calendar-plus"></i>&nbsp;Nuevo proveedor</a>
+        <a class="dropdown-item" href="#">Another action</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item" href="#">Something else here</a>
+      </div>
+    </div>
+  </div>
+  <!-- Card Body -->
+  <div class="card-body">
+
+
+    <table class="table tabled-striped table-hover" id="tablaProv">
+      <thead>
+        <th>Id</th>
+        <th>Descripción</th>
+        <th>Dirección</th>
+        <th>Contacto</th>
+        <th>Télefono</th>
+        <th>Email</th>
+        <th>Estado</th>
+
+        <th class="all">Acciones</th>
+      </thead>
+      <tbody class="table-content">
+
+        {% for item in obj  %}
+        <tr>
+          <td>{{item.id}}</td>
+          <td>{{item.descripcion}}</td>
+          <td>{{item.direccion}}</td>
+          <td>{{item.contacto}}</td>
+          <td>{{item.telefono}}</td>
+          <td>{{item.email}}</td>
+          <td>{{item.estado|yesno:"Activo,Inactivo"}}</td>
+
+          <td>
+            <a href="#" onclick="return abrir_modal('{% url 'cmp:proveedor_edit' item.id %}')"
+              class="btn btn-warning btn-circle" role="button"><i class="far fa-edit"></i></a>
+            {% if item.estado %}
+            <a href="#" data-url="{% url 'cmp:proveedor_inactive' item.id %}" name="{{item.descripcion}}"
+              data-id="{{item.id}}" class="btn btn-danger btn-circle btn-desactivate" role="button"
+              data-toggle="desactivate" data-placement="top" title="Desactivar proveedor"><i class="fa fa-thumbs-down"
+                aria-hidden="true"></i></a>
+
+            {% else %}
+            <!--<a href="#" onclick="return abrir_modal('{% url 'cmp:proveedor_active' item.id %}')"
+              class="btn btn-success btn-circle " role="button"><i class="fa fa-thumbs-up" aria-hidden="true"></i></a>-->
+            <a href="#" data-url="{% url 'cmp:proveedor_active' item.id %}" name="{{item.descripcion}}"
+              data-id="{{item.id}}" class="btn btn-success btn-circle btn-active" role="button" data-toggle="active"
+              data-placement="top" title="Activar proveedor"><i class="fa fa-thumbs-up" aria-hidden="true"></i></a>
+
+            {% endif %}
+
+
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock pagecontent %}
+{% block js_page %}
+<script>
+  $(document).ready(function () {
+
+    $('[data-toggle="active"]').tooltip({
+      trigger: 'hover'
+    })
+    $('[data-toggle="desactivate"]').tooltip({
+      trigger: 'hover'
+    })
+    var token = $("input[name=csrfmiddlewaretoken]").val();
+    $.ajaxSetup({
+      beforeSend: function (xhr, settings) {
+        if (!(/^http:.*/.test(settings.url) || /^http:.*/.test(settings.url))) {
+          xhr.setRequestHeader("X-CSRFToken", token);
+        }
+      }
+    });
+
+
+  });
+
+  $(document).on("click", ".btn-active", function (e) {
+    e.preventDefault()
+    var template = $(this).attr("data-url");
+    var titulo = $(this).attr("name");
+    var pk = $(this).attr("data-id");
+    console.log(template)
+    $.confirm({
+      title: 'Confirmar',
+      type: "green",
+      icon: "fa fa-info-circle",
+      content: '¿Desea activar ' + titulo + " ?",
+      buttons: {
+        formSubmit: {
+          text: 'Si,activar',
+          btnClass: 'btn-green',
+          action: function () {
+            var data = {
+              "id": pk
+            }
+            data = JSON.stringify(data)
+            $.ajax({
+              type: "POST",
+              url: template,
+              data: data,
+              beforeSend: function (xhr, settings) {
+                $.ajaxSettings.beforeSend(xhr, settings)
+              },
+              success: function (response) {
+                console.log($(response).html())
+                $("#tablaProv").empty()
+                $("#tablaProv").html($(response).find("#tablaProv").html())
+          
+                mensaje("Proovedor activado")
+                $('[data-toggle="active"]').tooltip({
+      trigger: 'hover'
+    })
+    $('[data-toggle="desactivate"]').tooltip({
+      trigger: 'hover'
+    })
+              },
+              error: function (e) {
+                console.log(e)
+              }
+            })
+          }
+        },
+        cancel: {
+          text: "Cancelar",
+        },
+
+      }
+    });
+
+
+  });
+
+
+  $(document).on("click", ".btn-desactivate", function (e) {
+    e.preventDefault()
+    var template = $(this).attr("data-url");
+    var titulo = $(this).attr("name");
+    var pk = $(this).attr("data-id");
+    $.confirm({
+      title: 'Confirmar',
+      icon: "fa  fa-exclamation-triangle",
+
+      type: "red",
+      content: '¿Desea desactivar ' + titulo + " ?",
+      buttons: {
+
+        formSubmit: {
+          text: 'Si,desactivar',
+          btnClass: 'btn-red',
+          action: function () {
+            var data = {
+              "id": pk
+            }
+            data = JSON.stringify(data)
+            console.log(template)
+            $.ajax({
+              type: "POST",
+              url: template,
+              data: data,
+              beforeSend: function (xhr, settings) {
+                $.ajaxSettings.beforeSend(xhr, settings)
+              },
+              success: function (response) {
+                $("#tablaProv").empty()
+                $("#tablaProv").html($(response).find("#tablaProv").html())
+                mensaje("Proovedor desactivado")
+                $('[data-toggle="active"]').tooltip({
+      trigger: 'hover'
+    })
+    $('[data-toggle="desactivate"]').tooltip({
+      trigger: 'hover'
+    })
+
+              },
+              error: function (e) {
+                console.log(e)
+              }
+            })
+          }
+        },
+        cancel: {
+          text: "Cancelar",
+        },
+
+
+      }
+    });
+
+
+  });
+ 
+</script>
+{% endblock js_page %}
