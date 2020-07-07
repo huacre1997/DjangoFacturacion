@@ -148,14 +148,15 @@ class FacturaNew(LoginRequiredMixin,  generic.CreateView):
 
     def get(self,request,*args, **kwargs):
         enc = FacturaEnc.objects.last()
-        encabezado={
+        encabezado={}
+        if enc:
+             encabezado={
             "id":enc.id+1
         }
-        # if not enc:
-        #     encabezado = {
-        #         'id':"0001",
-             
-        #     }
+        else:
+            encabezado={
+            "id":"10000"
+        }
         form=FacturaEncForm(request.POST)
         contexto = {"enc":encabezado,"form":form,"action":"add"}
         return render(request,self.template_name,contexto)
@@ -171,7 +172,10 @@ class FacturaNew(LoginRequiredMixin,  generic.CreateView):
                     item=i.toJSON()
                     item['value'] = i.descripcion
                     item["cantidad"]=request.POST["cantidad"]
+                  
+
                     data.append(item)
+
             elif action=="add":
                 with transaction.atomic():
                     vents=json.loads(request.POST["vents"])

@@ -22,7 +22,7 @@
 
                                 <div class="form-group col-lg-3">
                                     <label for="">Código:</label>
-                                    <input type="text" name="codigo" id="codigo" class="form-control" readonly >
+                                    <input type="text" name="codigo" id="codigo" class="form-control" readonly>
                                 </div>
                                 <div class="form-group col-lg-7 mt-1 mt-lg-0 col-12">
                                     <label for="">Descripción:</label>
@@ -265,7 +265,7 @@
                         class: 'text-center',
                         orderable: false,
                         render: function (data, type, row) {
-                            return '<input type="text" name="cant" class="form-control form-control-sm input-sm autocomplete="off" value="' +
+                            return '<input type="text" name="cant" ref="'+row.stock+'" class="form-control form-control-sm input-sm autocomplete="off" value="' +
                                 row.cantidad + '">';
                         }
                     },
@@ -280,8 +280,9 @@
                 ],
                 rowCallback(row, data) {
                     $(row).find("input[name='cant']").TouchSpin({
+                        min: 0,
+                        max: data.stock,
                         buttondown_class: 'btn btn-secondary',
-
                         buttonup_class: 'btn btn-secondary'
                     });
 
@@ -314,6 +315,17 @@
     }
 
     $(".btnAdd").click(function (event, ui) {
+
+        // if (vent.items.products.length === 0) {
+
+        // }else{
+        // //    if(vent.items.products[0].codigo==$("#codigo").val()){
+        // //        mensaje("El producto ya se encuentra seleccionado","red")
+        // //        vaciar()
+        // //        return false
+        // //    } 
+
+        // }
         if ($("#descripcion").val() === "" || $("#codigo").val() === null) {
             mensaje("Producto no seleccionado", "red", 1000);
             return false;
@@ -327,24 +339,41 @@
                     "action": "searchProduct",
                     "term": desc,
                     "cantidad": $("#cantidad").val(),
-
+                    "codigo": $("#codigo").val()
 
                 },
                 dataType: "json",
                 success: function (response) {
-                    if(response[0].stock===0){
-                        mensaje("No hay stock para este producto. Escoga otro e inténtelo nuevamente.","red",1500)
-                        vaciar()
+                
 
-                        return false
-                    }
                     vaciar()
-                        vent.items.products.push(response[0])
-                        vent.list()
-                       
+
+                    // console.log("el codigo es " + response[0].codigo)
+                    if (vent.items.products.length == 0) {
+                            vent.items.products.push(response[0])
+                        }                        else {
+
+                    for (const p in vent.items.products) {
+                            if (response[0].codigo == vent.items.products[p].codigo) {
+                                mensaje("Ese producto ya se encuentra seleccionado","red")
+                                return false
+                            } else {
+                                console.log("agregado")
+                                vent.items.products.push(response[0])
+                                break
+
+                            }
+                        
+                        }
+                    }
+                    vent.list()
                 }
+
+
             })
+
         }
+
     })
 
     var searchproduct
@@ -412,7 +441,7 @@
 
             $.ajax({
                 type: "POST",
-                url:"{% url 'fac:facturacion_new' %}",
+                url: "{% url 'fac:facturacion_new' %}",
                 data: {
                     "action": "searchProduct",
                     "term": request.term,
@@ -433,7 +462,13 @@
         minLength: 1,
         select: function (event, ui) {
 
-            console.log(ui.item)
+            if (ui.item.stock == 0) {
+                        mensaje("No hay stock para este producto. Escoga otro e inténtelo nuevamente.",
+                            "red", 1500)
+                        vaciar()
+
+                        return false
+                    }
             $("#codigo").val(ui.item.codigo)
             $("#precio").val(ui.item.precio)
             $("#cantidad").val(1)
@@ -478,21 +513,22 @@
             processData: false,
             contentType: false,
             success: function (response) {
-                console.log(response)
-                if(response["mensaje"]=="guardado"){
-                 mensaje("¡Factura registrada!","green",3000)
+                // console.log(response)
+                if (response["mensaje"] == "guardado") {
+                    mensaje("¡Factura registrada!", "green", 3000)
+                } else
+                if (response["mensaje"] == "editado") {
+                    mensaje("¡Factura editada!", "green", 3000)
+
                 }
-                else
-                    if(response["mensaje"]=="editado"){
-                        mensaje("¡Factura editada!","green",3000)
 
-                    }
 
-                    
             }
         }).done(function (data) {
-            
-            setTimeout(function(){location.href = '{% url "fac:facturacion_list"%}';},3000);
+
+            setTimeout(function () {
+                location.href = '{% url "fac:facturacion_list"%}';
+            }, 3000);
 
         }).fail(function (jqXHR, textStatus, errorThrown) {
             alert("done:" + textStatus + ': ' + errorThrown);
@@ -530,7 +566,8 @@
             buscarProducto();
         }
     });
-    function vaciar(){
+
+    function vaciar() {
         $("#codigo").val("")
         $("#descripcion").val("")
         $("#precio").val("")
@@ -544,10 +581,10 @@
         buttondown_class: 'btn btn-secondary',
 
         buttonup_class: 'btn btn-secondary'
-    });
-        {%if det %}
-             vent.items.products={{ det|safe }}
-        {%endif%}
+    }); 
+    {% if det %}
+    vent.items.products = {{det | safe}} 
+    {% endif %}
     vent.list()
     // $("#cantidad,#precio,#descuento_detalle").change(function (e) {
     //     calcular_Detalle()
