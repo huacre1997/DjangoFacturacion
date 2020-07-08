@@ -53,8 +53,13 @@
                 if($(this).text()==vent.items.products[p].codigo){
                     console.log( $(this).parent().find(".stock").text()+"-"+vent.items.products[p].cantidad )
                     var stockactual = $(this).parent().find(".stock").text()
+                    if($("#action").val()=="editarFactura"){
+                        $(this).parent().find(".stock").text(vent.items.products[p].stock)
+
+                    }else{
                     var stock = stockactual - vent.items.products[p].cantidad   
                     $(this).parent().find(".stock").text(stock)
+                    }
                 }
             }
 

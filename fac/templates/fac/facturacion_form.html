@@ -315,17 +315,6 @@
     }
 
     $(".btnAdd").click(function (event, ui) {
-
-        // if (vent.items.products.length === 0) {
-
-        // }else{
-        // //    if(vent.items.products[0].codigo==$("#codigo").val()){
-        // //        mensaje("El producto ya se encuentra seleccionado","red")
-        // //        vaciar()
-        // //        return false
-        // //    } 
-
-        // }
         if ($("#descripcion").val() === "" || $("#codigo").val() === null) {
             mensaje("Producto no seleccionado", "red", 1000);
             return false;
@@ -339,32 +328,30 @@
                     "action": "searchProduct",
                     "term": desc,
                     "cantidad": $("#cantidad").val(),
-                    "codigo": $("#codigo").val()
 
                 },
                 dataType: "json",
                 success: function (response) {
-                
-
+                    console.clear()
                     vaciar()
 
-                    // console.log("el codigo es " + response[0].codigo)
+                    console.log("el codigo es " + response[0].codigo)
+                    
                     if (vent.items.products.length == 0) {
                             vent.items.products.push(response[0])
                         }                        else {
-
+                            var inlist=false
                     for (const p in vent.items.products) {
+                        console.log(response[0].codigo+"=="+vent.items.products[p].codigo)
                             if (response[0].codigo == vent.items.products[p].codigo) {
-                                mensaje("Ese producto ya se encuentra seleccionado","red")
-                                return false
-                            } else {
-                                console.log("agregado")
-                                vent.items.products.push(response[0])
-                                break
-
-                            }
-                        
+                                inlist=true
+                            }                         
                         }
+                        if(inlist){
+                            mensaje("Ese producto ya se encuentra seleccionado","red")
+
+                        }else{      vent.items.products.push(response[0])
+}
                     }
                     vent.list()
                 }
@@ -435,7 +422,36 @@
 
 
     });
+    // $("select[name='descripcion']").select2({
+    //     theme:"bootstrap4",
+    //     language:"es",
+    //     allowClear:true,
+    //     ajax:{
+    //         type: "POST",
+    //             url: "{% url 'fac:facturacion_new' %}",
+    //             data:function(params) {
+    //                 var query={
+    //                 "action": "searchProduct",
+    //                 "term": params.term,
+    //                 "cantidad": $("#cantidad").val(),
+    //                 }
+    //                 return query
+    //             },
+    //             processResults:function(data){
+    //                 console.log(data)
 
+    //                 return{
+    //                     results:data
+    //                 }
+    //             },
+    //             dataType: "json",
+    //     }
+    // }).on("select2:select",function(e){
+    //     var data=e.params.data
+    //     $("#codigo").val(data.codigo)
+    //          $("#precio").val(data.precio)
+    //              $("#cantidad").val(1)
+    // })
     $("input[name='descripcion']").autocomplete({
         source: function (request, response) {
 

@@ -172,7 +172,7 @@ class FacturaNew(LoginRequiredMixin,  generic.CreateView):
                     item=i.toJSON()
                     item['value'] = i.descripcion
                     item["cantidad"]=request.POST["cantidad"]
-                  
+                    
 
                     data.append(item)
 
