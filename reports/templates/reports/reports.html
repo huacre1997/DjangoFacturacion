@@ -1,0 +1,106 @@
+{% extends "base/base.html" %}
+{% block collapseReportes %}collapse show{% endblock collapseReportes %}
+{% block navreportes %}nav-item active{% endblock navreportes %}
+{% block cliente %}collapse-item active{% endblock cliente %}
+{% block pagecontent %}
+<style>
+    .btn:focus,
+    .btn:active {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+    .middle{
+      vertical-align: middle !important;
+    }
+  </style>
+  <div class="container-fluid">
+  
+  <div class="card shadow">
+    <!-- Card Header - Dropdown -->
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between     bg-secondary
+    ">
+      <h6 class="m-0 font-weight-bold text-white"><i class="fas fa-chart-line"></i>&nbsp;
+        Reporte de Ventas</h6>
+      <div class="dropdown no-arrow">
+        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+        </a>
+        <!-- <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+          <div class="dropdown-header">Acciones</div>
+          <a class="dropdown-item NewClient" data-url="{% url 'fac:cliente_new' %}" href="#"><i
+              class="fa fa-plus-circle "></i>&nbsp;Nuevo Cliente</a>
+          <a class="dropdown-item" href="{% url 'cmp:compras_print_all' %}" target="reportes"><i
+              class="fas fa-print"></i>&nbsp;Imprimir listado</a>
+  
+        </div> -->
+      </div>
+    </div>
+    <!-- Card Body -->
+    <div class="card-body">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="form-group"><label for="">Rango de fechas</label>
+                    {{form.date_ranger}}
+                </div>
+            </div>
+        </div>
+      <table class="table  table-hover dt-responsive" id="tablaReportes" style="width: 100%;">
+        <thead>
+          <tr>
+            <th class="all">N°</th>
+          <th >Cliente</th>
+          <th>Fecha</th>
+          <th>SubTotal</th>
+          <th>Descuento</th>
+          <th>Total</th>
+          </tr>
+          
+  
+        </thead>
+  
+  
+  
+      </table>
+    </div>
+  </div>
+  </div>
+{% endblock pagecontent %}
+{% block js_page %}
+<script>
+      $('input[name="date_ranger"]').daterangepicker({
+    opens: 'left'
+  }, function(start, end, label) {
+    console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+  });
+   tabla = $("#tablaReportes").DataTable({
+     responsive:true,
+    //   ajax: {
+    //     url: "{% url 'fac:cliente_list' %}",
+    //     type: "POST",
+    //     data: {
+    //       "action": "searchData"
+    //     },
+    //     dataSrc: ""
+    //   },
+      "lengthMenu": [
+        [5, 10, 25, 50, -1],
+        [5, 10, 25, 50, "All"]
+      ],
+      "language": {
+        "sSearch": "Buscar",
+        "emptyTable": "No hay datos disponibles para esta tabla",
+        "lengthMenu": "Mostrando _MENU_ entradas",
+        "loadingRecords": "Cargando...",
+        "processing": "Procesando...",
+        "zeroRecords": "No se encontraron resultados",
+        "info": "Mostrando _START_ al _END_ de _TOTAL_ entradas",
+        "infoEmpty": "Mostrando 0 al 0 de 0 entradas",
+
+
+      },
+      
+    });
+</script>
+  
+{% endblock js_page %}

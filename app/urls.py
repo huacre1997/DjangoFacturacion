@@ -22,6 +22,7 @@ urlpatterns = [
     path("cmp/",include(("cmp.urls","cmp"),namespace="cmp")),
     path("fac/",include(("fac.urls","fac"),namespace="fac")),
     path("api/",include(("api.urls","api"),namespace="api")),
+    path("reports/",include(("reports.urls","rpt"),namespace="rpt")),
 
     path('admin/', admin.site.urls),
 ] 

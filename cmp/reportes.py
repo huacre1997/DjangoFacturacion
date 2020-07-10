@@ -46,7 +46,7 @@ def reportes_Compras(request):
         "request":request
     }
     response=HttpResponse(content_type="application/pdf")
-    response["Content-Disposition"]="inline;filename='todas_compras.pdf'"
+    response["Content-Disposition"]="attachment;filename='todas_compras.pdf'"
     template=get_template(template_path)
     html=template.render(context)
 

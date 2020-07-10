@@ -531,7 +531,13 @@
             success: function (response) {
                 // console.log(response)
                 if (response["mensaje"] == "guardado") {
-                    mensaje("¡Factura registrada!", "green", 3000)
+                    confirmar("Factura registrada","¿Desea imprimir la factura?","green",function(){
+                        window.open("/fac/ventas/invoice/pdf/"+response.id,"_blank")
+                        location.href = '{% url "fac:facturacion_list" %}';
+                    },function(){
+                       location.href = '{% url "fac:facturacion_list" %}';
+
+                    })
                 } else
                 if (response["mensaje"] == "editado") {
                     mensaje("¡Factura editada!", "green", 3000)
@@ -542,9 +548,9 @@
             }
         }).done(function (data) {
 
-            setTimeout(function () {
-                location.href = '{% url "fac:facturacion_list"%}';
-            }, 3000);
+            // setTimeout(function () {
+            //     location.href = '{% url "fac:facturacion_list"%}';
+            // }, 3000);
 
         }).fail(function (jqXHR, textStatus, errorThrown) {
             alert("done:" + textStatus + ': ' + errorThrown);

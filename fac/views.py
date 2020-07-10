@@ -5,6 +5,13 @@ from .models import FacturaEnc,FacturDet,Cliente
 from django.core import serializers
 from django.db import transaction
 
+import os
+from django.conf import settings
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from django.contrib.staticfiles import finders
+
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import ClienteForm,FacturaEncForm
@@ -192,6 +199,7 @@ class FacturaNew(LoginRequiredMixin,  generic.CreateView):
                         det.cantidad=int(i["cantidad"])
                         det.precio=float(i["precio"])
                         det.save()
+                    data={"id":enc.id}
                     data["mensaje"]="guardado"
 
             else:
@@ -242,6 +250,7 @@ class FacturaEdit(LoginRequiredMixin,  generic.UpdateView):
                         det.cantidad=int(i["cantidad"])
                         det.precio=float(i["precio"])
                         det.save()
+                    data={"id":enc.id}
                     data["mensaje"]="editado"
 
             else:
@@ -302,6 +311,46 @@ class FacturaEdit(LoginRequiredMixin,  generic.UpdateView):
     # html = render_to_string(self.template_name, contexto, request=request)
     # serialized_data = json.dumps({"form": html})
     # return HttpResponse(serialized_data,content_type = "application/json")
+class VentasPdf(LoginRequiredMixin,generic.View):
+    def link_callback(self, uri, rel):
+        sUrl = settings.STATIC_URL  # Typically /static/
+        sRoot = settings.STATIC_ROOT  # Typically /home/userX/project_static/
+        mUrl = settings.MEDIA_URL  # Typically /static/media/
+        mRoot = settings.MEDIA_ROOT  # Typically /home/userX/project_static/media/
+        if uri.startswith(mUrl):
+            path = os.path.join(mRoot, uri.replace(mUrl, ""))
+        elif uri.startswith(sUrl):
+            path = os.path.join(sRoot, uri.replace(sUrl, ""))
+        else:
+            return uri  # handle absolute uri (ie: http://some.tld/foo.png)
+
+        # make sure that file exists
+        if not os.path.isfile(path):
+            raise Exception(
+                'media URI must start with %s or %s' % (sUrl, mUrl)
+            )
+        return path
+    def get(self,request,*args, **kwargs):
+        try:
+            template=get_template("fac/ventaspdf.html")
+            context={
+                "enc": FacturaEnc.objects.get(pk=self.kwargs["pk"]),
+                'icon': '{}{}'.format(settings.MEDIA_URL,'milogo.png')
+            }
+            html=template.render(context)
+            response=HttpResponse(content_type="application/pdf")
+
+            # response["Content-Disposition"]='inline;filename="report.pdf"'
+            pisa_status = pisa.CreatePDF(
+                html, dest=response,
+                link_callback=self.link_callback)
+    # if error then show some funy view
+           
+            return response
+        except Exception as e:
+            print(e)
+        return HttpResponseRedirect(reverse_lazy("fac:facturacion_list"))
+      
 @login_required(login_url="/login/")
 def productoSearch(request):
     template_name="fac/producto_buscar.html"

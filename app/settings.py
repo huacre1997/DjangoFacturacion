@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'inv',
     'cmp',
     'fac',
+    "reports",
     "django_userforeignkey",
     "rest_framework",
     "tempus_dominus",
@@ -133,3 +134,6 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR,"static"),)
 LOGIN_REDIRECT_URL="/"
 LOGOUT_REDIRECT_URL="/login/"
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
+MEDIA_URL = '/media/'
