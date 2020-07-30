@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap.min.css">
   <!-- <link rel="stylesheet" href="{% static 'vendor/dtResponsive/css/responsive.bootstrap.min.css' %}"> -->
   <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.5/css/responsive.bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.5/css/responsive.bootstrap.min.css">
   <link href="{% static 'css/jquery-confirm.min.css' %}" rel="stylesheet">
   <link href="{% static 'css/select.min.css' %}" rel="stylesheet">
   <link href="{% static 'css/jquery-ui.min.css' %}" rel="stylesheet">
@@ -35,6 +35,7 @@
 
   <link href="{% static 'css/jquery.datetimepicker.min.css' %}" rel="stylesheet">
   <link href="{% static 'vendor/datatables/datatables.min.css'%}" rel="stylesheet">
+  <link href="{% static 'css/buttons.bootstrap.min.css' %}" rel="stylesheet">
 
 </head>
 
@@ -352,7 +353,7 @@
               <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{user.username}}</span>
-                <img class="img-profile rounded-circle" src="{% static 'img/user.png' %}">
+                <img class="img-profile rounded-circle" src="{{request.user.get_image}}">
               </a>
               <!-- Dropdown - User Information -->
               <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
@@ -369,10 +370,10 @@
                   Activity Log
                 </a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                <button class="dropdown-item"  onclick="return logout()">
                   <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                   Logout
-                </a>
+                </button>
               </div>
             </li>
 
@@ -387,7 +388,7 @@
         {% block pagecontent %}
 
         <div class="container">
-
+            
           <!-- Page Heading -->
           <h1 class="h3 mb-4 text-gray-800">Bienvenido {{user.first_name}} {{user.last_name}}</h1>
 
@@ -426,43 +427,9 @@
   </a>
 
   <!-- Logout Modal-->
-  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Info</h5>
-          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">×</span>
-          </button>
-        </div>
-        <div class="modal-body">¿Esta seguro que desea cerrar sesión?</div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
-          <a class="btn btn-primary" href="{% url 'bases:logout' %}">Cerrar Sesión</a>
-        </div>
-      </div>
-    </div>
-  </div>
 
 
-  <div class="modal fade" id="popup">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Info</h5>
-          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">×</span>
-          </button>
-        </div>
-        <div class="modal-body"></div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
-          <a class="btn btn-primary" href="{% url 'bases:logout' %}">Cerrar Sesión</a>
-        </div>
-      </div>
-    </div>
-  </div>
+ 
   <script src="{% static 'vendor/jquery/jquery-3.5.1.min.js'%}"></script>
 
   <!-- Bootstrap core JavaScript-->
@@ -490,20 +457,25 @@
   <script src="{% static 'js/spanish.js'%}"></script>
 
   <script src="{% static 'js/daterangepicker.js'%}"></script>
+  <script src="{% static 'js/dataTables.buttons.min.js'%}"></script>
+  <script src="{% static 'js/jszip.min.js'%}"></script>
+  <script src="{% static 'js/pdfmake.min.js'%}"></script>
+  <script src="{% static 'js/vfs_fonts.js'%}"></script>
+  <script src="{% static 'js/vfs_fonts.js'%}"></script>
+  <script src="{% static 'js/buttons.html5.min.js'%}"></script>
 
   <script src="{% static 'js/jquery.datetimepicker.full.min.js'%}"></script>
+  <script src="{% static 'highcharts-8.1.2/highcharts.js' %}"></script>
+  <script src="{% static 'highcharts-8.1.2/modules/heatmap.js'%}"></script>
 
-  <script>
-
-  </script>
+  <script src="{% static 'highcharts-8.1.2/modules/exporting.js'%}"></script>
+  <script src="{% static 'highcharts-8.1.2/modules/export-data.js' %}"></script>
+  <script src="{% static 'highcharts-8.1.2/modules/accessibility.js' %}"></script>
 
   {% block control_modal %}
   <script>
     var de,tabla
-    $(document).ready(function () {
-    
-       
-    });
+   
 
     function abrir_modal(url) {
       console.log(url)
@@ -520,6 +492,37 @@
     function cerrar_modal() {
       $("#popup").modal("hide");
       return false
+    }
+    function logout(){
+     var der=$.confirm({
+        theme:"modern",
+        title: "Confirmar",
+        type: "blue",
+        icon: "fa fa-info",
+        content: "¿Desea cerrar sesión?",
+        typeAnimated:true,
+        animation: 'scale',
+        closeAnimation: 'scale',
+        columnClass:"small",
+        buttons:{
+          Si:{
+            Text:"Si",
+            btnClass:"btn-primary",
+            action:function(){
+                window.location.pathname="logout"
+            }
+
+          },
+          No:{
+            Text:"No",
+            btnClass:"btn-red",
+            action:function(){
+              der.close()
+            }
+
+          }
+        }
+      })
     }
     function confirmar(titulo,content,color,callback,cancel) {
       if (color == "red") {

@@ -123,7 +123,7 @@
 
       },
       "order": [
-        [0, 'asc']
+        [2, 'desc']
       ],
       columns: [{
           "data": 'id',
@@ -170,9 +170,18 @@
             return buttons;
 
           },
+          
 
 
         },
+        {
+        targets:[-2,-3,-4],
+        class: "text-center",
+        orderable: false,
+        render: function(data,type,row){
+          return 'S/.' + parseFloat(data).toFixed(2);
+        }
+      },
 
         {
           "targets": 1,

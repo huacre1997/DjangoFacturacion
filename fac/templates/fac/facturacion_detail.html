@@ -18,6 +18,12 @@
                         <input type="text" class="col-lg-2 form-control" readonly value="{{item.fc|date:'H:i:s'}}">
                     
                     </div>
+                    <div class="form-group row">
+                        <label class="col-form-label col-lg-2">Empleado:</label>
+                        <input type="text" class="col-lg-6 form-control" readonly value="{{item.uc.last_name|upper}} {{item.uc.first_name|upper}}">
+                      
+                    
+                    </div>
                     {%endfor%}
                     <table class="table  table-hover " id="tablaDetail" style="width: 100%;">
                         <thead>
@@ -53,7 +59,7 @@
                         <input type="text" class="col-lg-2 form-control" readonly value="{{item.descuento}}">
                     </div>
                     <div class="form-group row">
-                        <a href="{% url 'fac:ventas_pdf' item.id %}" id="" class="btn btn-primary col-lg-2" href="#" role="button"><i class="fas fa-print"></i>&nbsp;Imprimir</a>
+                        <a href="#" onclick="return pdf({{item.id}})" id="" class="btn btn-primary col-lg-2" href="#" role="button"><i class="fas fa-print"></i>&nbsp;Imprimir</a>
                         <label class="col-form-label col-lg-2 offset-lg-6">Total:</label>
                         <input type="text" class="col-lg-2 form-control" readonly value="{{item.total}}">
                     </div>
@@ -96,5 +102,9 @@
             ],
         })
     });
+    function pdf(id){
+        window.open("/fac/ventas/invoice/pdf/"+id,"_blank")
+
+    }
 </script>
 {% endblock js_page %}

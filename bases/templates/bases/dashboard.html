@@ -1,0 +1,271 @@
+{% extends "base/base.html" %}
+{% block pagecontent %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-6">
+            <div id="container"></div>
+        </div>
+   
+        <div class="col-lg-6">
+            <div id="container2"></div>
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div id="container3"></div>
+        </div>
+    </div>
+</div>
+{%endblock%}
+{% block js_page %}
+<script>
+    function getPointCategoryName(point, dimension) {
+    var series = point.series,
+        isY = dimension === 'y',
+        axis = series[isY ? 'yAxis' : 'xAxis'];
+    return axis.categories[point[isY ? 'y' : 'x']];
+}
+
+var graphCliente=Highcharts.chart('container3', {
+
+    chart: {
+        type: 'heatmap',
+        marginTop: 40,
+        marginBottom: 80,
+        plotBorderWidth: 1
+    },
+
+
+    title: {
+        text: 'Sales per employee per weekday'
+    },
+
+    xAxis: {
+        categories: {{empleado|safe}}
+    },
+
+    yAxis: {
+        categories: [
+            "0",
+            'Enero',
+            'Febrero',
+            'Marzo',
+            'Abril',
+            'Mayo',
+            'Junio',
+            'Julio',
+            'Agosto',
+            'Setiembre',
+            'Octubre',
+            'Noviembre',
+            'Diciembre'
+        ],
+        title: null,
+        reversed: true
+    },
+
+    accessibility: {
+        point: {
+            descriptionFormatter: function (point) {
+                var ix = point.index + 1,
+                    xName = getPointCategoryName(point, 'x'),
+                    yName = getPointCategoryName(point, 'y'),
+                    val = point.value;
+                return ix + '. ' + xName + ' sales ' + yName + ', ' + val + '.';
+            }
+        }
+    },
+
+    colorAxis: {
+        min: 0,
+        minColor: '#FFFFFF',
+        maxColor: Highcharts.getOptions().colors[0]
+    },
+
+    legend: {
+        align: 'right',
+        layout: 'vertical',
+        margin: 0,
+        verticalAlign: 'top',
+        y: 25,
+        symbolHeight: 280
+    },
+
+    tooltip: {
+        formatter: function () {
+            return '<b>' + getPointCategoryName(this.point, 'x') + '</b> sold <br><b>' +
+                this.point.value + '</b> items on <br><b>' + getPointCategoryName(this.point, 'y') + '</b>';
+        }
+    },
+
+
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 500
+            },
+            chartOptions: {
+                yAxis: {
+                    labels: {
+                        formatter: function () {
+                            return this.value.charAt(0);
+                        }
+                    }
+                }
+            }
+        }]
+    }
+
+});
+ var graphProduct=Highcharts.chart('container2', {
+    chart: {
+        plotBackgroundColor: null,
+        plotBorderWidth: null,
+        plotShadow: false,
+        type: 'pie'
+    },
+    title: {
+        text: 'Procentaje de venta de productos por el mes de Junio del año 2020'
+    },
+    tooltip: {
+        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+    },
+    accessibility: {
+        point: {
+            valueSuffix: '%'
+        }
+    },
+    plotOptions: {
+        pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+                enabled: true,
+                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+            }
+        }
+    },
+   
+});
+var graphColumn=Highcharts.chart('container', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: "Reporte de ventas del 2020"
+    },
+    subtitle: {
+        text: ''
+    },
+    xAxis: {
+        categories: [
+            'Enero',
+            'Febrero',
+            'Marzo',
+            'Abril',
+            'Mayo',
+            'Junio',
+            'Julio',
+            'Agosto',
+            'Setiembre',
+            'Octubre',
+            'Noviembre',
+            'Diciembre'
+        ],
+        crosshair: true
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: 'Valores S/.'
+        }
+    },
+    tooltip: {
+        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+            '<td style="padding:0"><b>S/.{point.y:.1f} </b></td></tr>',
+        footerFormat: '</table>',
+        shared: true,
+        useHTML: true
+    },
+    plotOptions: {
+        column: {
+            pointPadding: 0.2,
+            borderWidth: 0
+        }
+    },
+ 
+});
+function get_graph_employees(){
+    $.ajax({
+        type: "POST",
+        url: window.location.pathname,
+        data: {
+            "action":"get_graph_empleado"
+        },
+        dataType: "json",
+ 
+    }).done(function(data){
+        if(!data.hasOwnProperty("error")){
+            graphCliente.addSeries({
+                name: 'Sales per employee',
+        borderWidth: 1,
+        data: data,
+        dataLabels: {
+            enabled: true,
+            color: '#000000'
+        }
+             } )
+            return false;
+        }
+    });
+}
+function get_graph_Sales(){
+    $.ajax({
+        type: "POST",
+        url: window.location.pathname,
+        data: {
+            "action":"get_graph_Sales"
+        },
+        dataType: "json",
+ 
+    }).done(function(data){
+        if(!data.hasOwnProperty("error")){
+            graphColumn.addSeries({
+                name:"Procentaje de venta",
+                showInLegend:false,
+                colorByPoint:true,
+                data:data
+             } )
+            return false;
+        }
+    });
+}
+function get_graph_Products(){
+    $.ajax({
+        type: "POST",
+        url: window.location.pathname,
+        data: {
+            "action":"get_graph_products"
+        },
+        dataType: "json",
+ 
+    }).done(function(data){
+        if(!data.hasOwnProperty("error")){
+            graphProduct.addSeries({
+                name:"Brends",       
+                colorByPoint:true,
+                data:data
+             } )
+            return false;
+        }
+    });
+}
+$(function () {
+    get_graph_Sales()
+    get_graph_Products()
+    get_graph_employees()
+});
+</script>
+{% endblock %}    

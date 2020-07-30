@@ -6,7 +6,7 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.db.models import Sum
 from datetime import datetime
-
+from django.contrib.auth.models import User
 class Cliente(ClaseModelo):
     NAT="Natural"
     JUR="Jurídica"
@@ -17,7 +17,7 @@ class Cliente(ClaseModelo):
     nombres=models.CharField(max_length=100,blank=False,unique=True,error_messages={'unique': 'Please enter your name'})
     apellidos=models.CharField(max_length=100,unique=True,blank=False)
     celular=models.CharField(max_length=20,null=True,blank=False,unique=True)
-    tipo=models.CharField(max_length=10,choices=TIPO_CLIENTE,default=NAT)
+    tipo=models.CharField(max_length=10,choices=TIPO_CLIENTE,default="NAT")
     def __str__(self):
         return "{} {}".format(self.apellidos,self.nombres)
     def save(self):

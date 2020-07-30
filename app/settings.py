@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'cmp',
     'fac',
     "reports",
+    "user",
     "django_userforeignkey",
     "rest_framework",
     "tempus_dominus",
@@ -137,3 +138,4 @@ LOGOUT_REDIRECT_URL="/login/"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 MEDIA_URL = '/media/'
+AUTH_USER_MODEL="user.User"
