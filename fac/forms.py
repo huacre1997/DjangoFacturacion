@@ -4,9 +4,6 @@ from datetime import datetime
 from tempus_dominus.widgets import DatePicker,TimePicker,DateTimePicker
 
 class FacturaEncForm(ModelForm):
-
-
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

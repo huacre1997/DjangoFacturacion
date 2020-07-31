@@ -1,4 +1,8 @@
 {% extends 'base/base.html'%}
+{% block collapseCompras %}collapse show{% endblock collapseCompras %}
+{% block compra_new %}collapse-item active{% endblock compra_new %} 
+{% block navcompras %}nav-item active{% endblock navcompras %}
+
 {% block pagecontent %}
 <form method="post" id="frmCompras">
     {% csrf_token %}

@@ -1,67 +1,50 @@
 {% extends "base/base.html" %}
-{% block navventas %}nav-item active{% endblock navventas %}
-{% block collapseVentas %}collapse show{% endblock collapseVentas %}
-{% block cliente %}collapse-item active{% endblock cliente %}
-{% block pagecontent %}
-<style>
 
-</style>
+{% block pagecontent %}
 <div class="container-fluid">
 
-<div class="card shadow">
-  <!-- Card Header - Dropdown -->
-  <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-    <h6 class="m-0 font-weight-bold text-primary">Listado de Clientes</h6>
-    <div class="dropdown no-arrow">
-      <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
-        aria-haspopup="true" aria-expanded="false">
-        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-      </a>
-      <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-        <div class="dropdown-header">Acciones</div>
-        <a class="dropdown-item NewClient" data-url="{% url 'fac:cliente_new' %}" href="#"><i
-            class="fa fa-plus-circle "></i>&nbsp;Nuevo Cliente</a>
-        <a class="dropdown-item" href="{% url 'cmp:compras_print_all' %}" target="reportes"><i
-            class="fas fa-print"></i>&nbsp;Imprimir listado</a>
-
+    <div class="card shadow">
+      <!-- Card Header - Dropdown -->
+      <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">Listado de Usuarios</h6>
+        <a class="btn btn-primary NewUser" href="{% url 'user:create_user' %}"><i
+            class="fa fa-plus-circle "></i>&nbsp;Nuevo usuario</a>
+      </div>
+      <!-- Card Body -->
+      <div class="card-body">
+    
+        <table class="table  table-hover dt-responsive" id="TablaUser" style="width: 100%;">
+          <thead>
+            <tr>
+            <th class="all">Id</th>
+            <th>Nombres</th>
+            <th>Apellidos</th>
+            <th>Username</th>
+            <th>Fecha de registro</th>
+           
+            <th>Imagen</th>
+            <th>Estado</th>
+            <th>Opciones</th>
+            </tr>
+            
+    
+          </thead>
+    
+    
+    
+        </table>
       </div>
     </div>
-  </div>
-  <!-- Card Body -->
-  <div class="card-body">
-
-    <table class="table  table-hover dt-responsive" id="tablaCli" style="width: 100%;">
-      <thead>
-        <tr>
-          <th class="all">Id</th>
-        <th >Nombre</th>
-        <th>Apellidos</th>
-        <th>Tipo</th>
-        <th>Celular</th>
-        <th>Estado</th>
-        <th class="all">Acciones</th>
-        </tr>
-        
-
-      </thead>
-
-
-
-    </table>
-  </div>
-</div>
-</div>
-
-{% endblock pagecontent %}
-{% block js_page %}
-<script>
-
-  $(document).ready(function () {
-
-   tabla = $("#tablaCli").DataTable({
+    </div>
+    
+    {% endblock pagecontent %}
+    {% block js_page %}
+    <script>
+        $(document).ready(function () {
+            tabla = $("#TablaUser").DataTable({
      responsive:true,
       ajax: {
-        url: "{% url 'fac:cliente_list' %}",
+        url: "{% url 'user:userList' %}",
         type: "POST",
         data: {
           "action": "searchData"
@@ -91,20 +74,28 @@
           "data": 'id',className: "text-center middle",
         },
         {
-          "data": 'nombres',className: "middle"
+          "data": 'first_name',className: "middle"
         },
         {
-          "data": 'apellidos',className: "middle"
+          "data": 'last_name',className: "middle"
         },
         {
-          "data": 'tipo',className: "middle"
+          "data": 'username',className: "middle"
         },
         {
-          "data": 'celular',className: "middle"
+          "data": 'date_joined',className: "middle"
 
         },
         {
-          "data": 'estado',
+          "data": 'image',
+          className: "text-center middle",
+          render:function(data,type,row){
+            return "<img src='"+row.image+"' class='img-fluid mx-auto d-block' style='width:40px;height:40px;'>"
+
+          }
+        },
+        {
+          "data": 'is_active',
           className: "estado middle",
           render: function (data, type, row) {
             if (data) {
@@ -115,7 +106,7 @@
           }
         },
         {
-          "data": 'estado',className:"text-center middle"
+          "data": 'id',className:"text-center middle"
         },
 
 
@@ -134,7 +125,7 @@
           },
 
         },
-
+       
 
       ],
       "createdRow": function (row, data, index) {
@@ -146,46 +137,11 @@
       },
 
     });
-
-
-    $(document).on("click", ".btnEdit", function (e) {
-      e.preventDefault()
-      var tr = tabla.cell($(this).closest("td")).index();
-      var data = tabla.row(tr.row).data();
-
-        de = $.confirm({
-        title: "Editar Cliente",
-        content: "URL:edit/" + data.id,
-        columnClass: 'col-lg-5 col-md-8 col-sm-10',
-        icon: "fa fa-edit",
-        type: "orange",
-        scrollToPreviousElement: true,
-        scrollToPreviousElementAnimate: true,
-
-        buttons: {
-          Confirm: {
-            text: 'Guardar cambios',
-            btnClass: 'btn-blue',
-
-            action: function url(e) {
-              
-              this.$content.find("#form").children("#btnEdit").trigger('click');
-              return false;
-          }
-          },
-          
-          cancel: function () {},
-        },
-    
-
-
-      });
-    });
-    $('.NewClient').on("click", function (e) {
+    $('.NewUser').on("click", function (e) {
       e.preventDefault()
       var template = $(this).attr("data-url");
       var jc = $.confirm({
-        title: "Nuevo Cliente",
+        title: "Nuevo Usuario",
         content: "URL:new",
         columnClass: 'col-lg-5 col-md-8 col-sm-10',
         icon: "fa fa-plus-circle",
@@ -193,25 +149,28 @@
         scrollToPreviousElement: false,
         buttons: {
           formSubmit: {
-            text: 'Registrar Cliente',
+            text: 'Registrar Usuario',
             btnClass: 'btn-blue',
             action: function () {
-              var nombre = $("#id_nombres").val()
-              var apellido = $("#id_apellidos").val()
-              var celular = $("#id_celular").val()
+    
 
-              form = this.$content.find('.needs-validation')
+              form = this.$content.find('.needs-validation')[0]
+              console.log(form)
+              var paramaters=new FormData(form)
+             
               $.ajax({
                 type: "POST",
-                url: "{% url 'fac:cliente_new' %}",
-                data: form.serialize(),
+                url: "{% url 'user:create_user' %}",
+                data: paramaters,
                 dataType: "json",
+                processData: false,  // tell jQuery not to process the data
+                contentType: false,
                 success: function (data) {
-
+                  console.log(data)
                   if (data["stat"] == "ok") {
-                    mensaje("Cliente registrado")
+                    mensaje("Usuario registrado")
                     jc.close()
-                    $("#tablaCli").DataTable().ajax.reload()
+                    $("#TablaUser").DataTable().ajax.reload()
 
                   } else {
                 
@@ -252,7 +211,6 @@
     });
 
 
-
-  });
-</script>
-{% endblock js_page %}
+        });
+    </script>
+    {% endblock js_page %}

@@ -29,6 +29,7 @@
   <link href="{% static 'css/select.min.css' %}" rel="stylesheet">
   <link href="{% static 'css/jquery-ui.min.css' %}" rel="stylesheet">
   <link href="{% static 'css/daterangepicker.css' %}" rel="stylesheet">
+  <link href="{% static 'css/style.css' %}" rel="stylesheet">
 
   <link href="{% static 'css/select2-bootstrap4.min.css' %}" rel="stylesheet">
   <link href="{% static 'css/jquery.bootstrap-touchspin.min.css' %}" rel="stylesheet">
@@ -40,15 +41,11 @@
 </head>
 
 <body class="bg-gradient-primary">
- 
   {% block sidebar %}
-
   <!-- Page Wrapper -->
   <div id="wrapper">
-
     <!-- Sidebar -->
     <ul class="navbar-nav bg-gradient-dark sidebar sidebar-dark accordion" id="accordionSidebar">
-
       <!-- Sidebar - Brand -->
       <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'bases:casa' %}">
         <div class="sidebar-brand-icon">
@@ -56,11 +53,8 @@
         </div>
         <div class="sidebar-brand-text mx-3">&nbsp;InventSystem <sup>20</sup></div>
       </a>
-
       <!-- Divider -->
       <hr class="sidebar-divider my-0">
-
-
       <!-- Divider -->
       <hr class="sidebar-divider">
 
@@ -86,33 +80,52 @@
             <a class="{% block marca %}collapse-item{% endblock marca %}" href="{% url 'inv:marca_list' %}">Marcas</a>
             <a class="{% block producto %}collapse-item{% endblock producto %}"
               href="{% url 'inv:product_list' %}">Productos</a>
-            <a class="{% block cliente %}collapse-item{% endblock cliente %}"
-              href="{% url 'fac:cliente_list' %}">Clientes</a>
+           
           </div>
-          <div class="bg-white py-2 collapse-inner rounded">
+          <!-- <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Cátalogos de compra:</h6>
-            <a class="{% block proveedor %}collapse-item{% endblock proveedor %}"
-              href="{% url 'cmp:proveedor_list' %}">Proveedores</a>
+           
         
-          </div>
+          </div> -->
         </div>
       </li>
 
 
-      <li class="{% block navmovimientos %}nav-item{% endblock navmovimientos %}" id="movimientos">
+      <li class="{% block navcompras %}nav-item{% endblock navcompras %}" id="compras">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
           aria-expanded="true" aria-controls="collapseUtilities">
-          <i class="fas fa-fw fa-wrench"></i>
-          <span>Movimientos</span>
+          <i class="fas fa-truck"></i>
+          <span>Compras</span>
         </a>
         <div id="collapseUtilities" class="{% block collapseCompras %}collapse{% endblock collapseCompras %}"
           aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
-            <h6 class="collapse-header">Entradas</h6>
-            <a class="{% block compras %}collapse-item{% endblock compras %}"
-              href="{% url 'cmp:compras_list' %}">Compras</a>
-              <a class="{% block facturas %}collapse-item{% endblock facturas %}"
-              href="{% url 'fac:facturacion_list' %}">Ventas</a>
+            <a class="{% block proveedor %}collapse-item{% endblock proveedor %}"
+            href="{% url 'cmp:proveedor_list' %}">Proveedores</a>
+              <a class="{% block compra_new %}collapse-item{% endblock compra_new %}"
+              href="{% url 'cmp:compras_new' %}">Realizar compra</a>
+              <a class="{% block compras %}collapse-item{% endblock compras %}"
+              href="{% url 'cmp:compras_list' %}">Compras realizadas</a>
+          </div>
+        </div>
+      </li>
+      <li class="{% block navventas %}nav-item{% endblock navventas %}">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities2"
+          aria-expanded="true" aria-controls="collapseUtilities">
+          <i class="fas fa-shopping-cart"></i>
+          <span>Ventas</span>
+        </a>
+        <div id="collapseUtilities2" class="{% block collapseVentas %}collapse{% endblock collapseVentas %}"
+          aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+
+            <a class="{% block cliente %}collapse-item{% endblock cliente %}"
+            href="{% url 'fac:cliente_list' %}">Clientes</a>
+            <a class="{% block venta_new %}collapse-item{% endblock venta_new %}"
+              href="{% url 'fac:facturacion_new' %}">Realizar Venta</a>
+              <a class="{% block venta_list %}collapse-item{% endblock venta_list %}"
+              href="{% url 'fac:facturacion_list' %}">Ventas realizadas</a>
+       
           </div>
         </div>
       </li>
@@ -463,17 +476,54 @@
   <script src="{% static 'js/vfs_fonts.js'%}"></script>
   <script src="{% static 'js/vfs_fonts.js'%}"></script>
   <script src="{% static 'js/buttons.html5.min.js'%}"></script>
-
   <script src="{% static 'js/jquery.datetimepicker.full.min.js'%}"></script>
   <script src="{% static 'highcharts-8.1.2/highcharts.js' %}"></script>
   <script src="{% static 'highcharts-8.1.2/modules/heatmap.js'%}"></script>
-
   <script src="{% static 'highcharts-8.1.2/modules/exporting.js'%}"></script>
   <script src="{% static 'highcharts-8.1.2/modules/export-data.js' %}"></script>
   <script src="{% static 'highcharts-8.1.2/modules/accessibility.js' %}"></script>
+  <style>
+  .activo{
+    color:rgba(255,255,255,.8) !important
 
+    }
+    .activoIcon{
+      color:rgba(255,255,255,.3) !important
+
+    }
+    li:hover .activo {
+    color: white !important;
+  } 
+    li:hover .activoIcon {
+      color: white !important;
+
+  } 
+  </style>
   {% block control_modal %}
   <script>
+    $(document).ready(function () {
+      $("#accordionSidebar>li").each(function(index) {
+        if($(this).hasClass("active")){}
+        else{
+          $(this).on("click",function(){
+         if($(this).find("div.collapse").hasClass("show")){
+         
+          $(this).find(".nav-link").addClass("activo")
+          $(this).find(".nav-link>i").addClass("activoIcon")
+         
+         }
+       else{ 
+        $(this).find(".nav-link").removeClass("activo")
+       }
+     })
+        }
+  
+      });
+      
+     
+    
+        
+    });
     var de,tabla
    
 
@@ -591,7 +641,12 @@
 
   {% endblock control_modal %}
   {% block js_page %}
-
+    <script>
+      alert("ga")
+      $(document).ready(function () {
+      
+      });
+    </script>
   {% endblock js_page %}
 </body>
 
