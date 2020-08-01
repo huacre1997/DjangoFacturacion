@@ -10,27 +10,88 @@
     <input type="hidden" value="{% if obj %}edit{% else %}add{% endif %}" name="action">
 
     <div class="card-body" style="padding:0 1rem;">
-        {% for field in form.visible_fields %}
-                    <div class="form-group">
-                        <label for="email">{{ field.label }}:</label>
-                        {{ field}}
-                    </div>
-                {% endfor %}
-  
-                {% if form.errors %}
-           
-                {% for field in form %}
-                    {% for error in field.errors %}
-                      {{ error }}
-                    {% endfor %}
-                {% endfor %}
-                {% for error in form.non_field_errors %}
-                    {{ error }}
-                {% endfor %}
-               
-            {% endif %}
-    
-    <button type="submit" class="btn btn-primary" id="btnEdit" style="display:none">Submit</button>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="">Nombres:</label>
+          <input value="{% if obj %}{{obj.first_name}}{% endif %}" type="text" name="first_name" id="id_first_name"
+            placeholder="Ingrese nombres"
+            class="{% if form.errors.first_name %}form-control is-invalid{% else %}form-control{% endif %} " required>
 
+          <div class="invalid-feedback">
+            {% if form.errors.first_name %}
+            {% for error in form.first_name.errors %}
+            {{ error }}
+            {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+        <div class="form-group col-md-6">
+          <label for="">Apellidos:</label>
+          <input value="{% if obj %}{{obj.last_name}}{% endif %}" type="text" name="last_name" id="id_last_name"
+            placeholder="Ingrese apellidos"
+            class="{% if form.errors.last_name %}form-control is-invalid{% else %}form-control{% endif %} " required>
+          <div class="invalid-feedback">
+            {% if form.errors.last_name %}
+            {% for error in form.last_name.errors %}
+            {{ error }}
+            {% endfor %}
+            {% endif %}
+          </div>
+        </div>
       </div>
-    </form>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="">Usuario:</label>
+          <input value="{% if obj %}{{obj.username}}{% endif %}" type="text" name="username" id="id_username"
+            placeholder="Usuario"
+            class="{% if form.errors.username %}form-control is-invalid{% else %}form-control{% endif %} " required>
+
+          <div class="invalid-feedback">
+            {% if form.errors.username %}
+            {% for error in form.username.errors %}
+              {{ error }}
+            {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+        <div class="form-group col-md-6">
+          <label for="">Contraseña:</label>
+          <input value="{% if obj %}{{obj.password}}{% endif %}" type="password" name="password" id="id_password"
+            placeholder="Ingrese contraseña"
+            class="{% if form.errors.password %}form-control is-invalid{% else %}form-control{% endif %} " required>
+
+          <div class="invalid-feedback">
+            {% if form.errors.password %}
+            {% for error in form.password.errors %}
+            {{ error }}
+            {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="">Usuario activo:</label>
+          <input value="{% if obj %}{{obj.is_active}}{% endif %}" type="checkbox" name="is_active" id="id_is_active"
+            class="{% if form.errors.is_active %}form-control is-invalid{% else %}form-control{% endif %} " >
+
+       
+        </div>
+        <div class="form-group col-md-6">
+          <label for="">Imagen:</label>
+          <input value="{% if obj %}{{obj.Image}}{% endif %}" type="file" name="Image" id="id_Image"
+            class="{% if form.errors.Image %}form-control is-invalid{% else %}form-control{% endif %} " >
+
+          <div class="invalid-feedback">
+            {% if form.errors.password %}
+            {% for error in form.password.errors %}
+            {{ error }}
+            {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" id="btnEdit" style="display:none">Submit</button>
+
+    </div>
+  </form>

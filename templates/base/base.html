@@ -136,6 +136,21 @@
         </a>
        
       </li>
+      <li class="{% block navusuario %}nav-item{% endblock navusuario %}" id="compras">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities4"
+          aria-expanded="true" aria-controls="collapseUtilities">
+          <i class="fas fa-users"></i>
+          <span>Usuarios</span>
+        </a>
+        <div id="collapseUtilities4" class="{% block collapseUsuarios %}collapse{% endblock  %}"
+          aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <a class="{% block usuario_list %}collapse-item{% endblock  %}"
+            href="{% url 'user:userList' %}">Administrar usuarios</a>
+        
+          </div>
+        </div>
+      </li>
       <!-- Divider 
       <hr class="sidebar-divider">
 

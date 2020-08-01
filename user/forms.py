@@ -1,13 +1,14 @@
-from django.forms import *
-from .models import  User
+from django import forms
+from  django.contrib.auth.models import User
 from datetime import datetime
 from tempus_dominus.widgets import DatePicker,TimePicker,DateTimePicker
-class UserForm(ModelForm):
-       
-   
+class UserForm(forms.ModelForm):
+    first_name = forms.CharField( max_length=100,required=True)   
+    last_name = forms.CharField( max_length=100,required=True)   
+
     class Meta:
         model = User
-        fields="__all__"
+        
 
         exclude=["groups","user_permissions","last_login","date_joined"]
      
@@ -31,4 +32,4 @@ class UserForm(ModelForm):
         except Exception as e:
             data['error'] = str(e)
         return data         
-       
+    

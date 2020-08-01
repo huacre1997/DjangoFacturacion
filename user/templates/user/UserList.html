@@ -1,5 +1,7 @@
 {% extends "base/base.html" %}
-
+{% block navusuario %}nav-item active{% endblock  %}
+{% block collapseUsuarios %}collapse show{% endblock  %}
+{% block usuario_list %}collapse-item active{% endblock  %}
 {% block pagecontent %}
 <div class="container-fluid">
 
@@ -21,7 +23,6 @@
             <th>Apellidos</th>
             <th>Username</th>
             <th>Fecha de registro</th>
-           
             <th>Imagen</th>
             <th>Estado</th>
             <th>Opciones</th>
@@ -143,7 +144,7 @@
       var jc = $.confirm({
         title: "Nuevo Usuario",
         content: "URL:new",
-        columnClass: 'col-lg-5 col-md-8 col-sm-10',
+        columnClass: 'col-lg-8 col-md-10 col-sm-10',
         icon: "fa fa-plus-circle",
         type: "blue",
         scrollToPreviousElement: false,
@@ -175,9 +176,7 @@
                   } else {
                 
                     $("#form").html($(data).html())
-                    $("#id_nombres").val(nombre)
-                    $("#id_apellidos").val(apellido)
-                    $("#id_celular ").val(celular)
+                 
                     $(":text").keypress(function (e) {
                       $(this).removeClass("is-invalid")
                     });

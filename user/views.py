@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.template.loader import render_to_string
-
+from django.contrib.auth import authenticate
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
@@ -10,11 +10,12 @@ from django.forms.models import model_to_dict
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
-from .models import User
+from  .models import User
 from django.http import HttpResponse
 from .forms import UserForm
 class UserListView(generic.ListView,LoginRequiredMixin):
     model=User
+    
     template_name="user/UserList.html"
     login_url = "bases:login"
     @method_decorator(csrf_exempt)
@@ -27,8 +28,7 @@ class UserListView(generic.ListView,LoginRequiredMixin):
             if action=="searchData":
                 data=[]
                 for i in User.objects.all():
-                    data.append(i.toJSON())
-               
+                    data.append(i.toJSON())   
             else:
                 data["error"]="Ha ocurrido un error"
         except Exception as e:
@@ -45,7 +45,6 @@ class CreateUserView(generic.CreateView,LoginRequiredMixin):
             action=request.POST["action"]
             if action=="add":
                 form = self.get_form()
-                print(form)
                 if form.is_valid():
                    
                     form.save()
@@ -58,7 +57,7 @@ class CreateUserView(generic.CreateView,LoginRequiredMixin):
                     data = render_to_string(self.template_name,{'form': form}, request=request)
                     return HttpResponse(json.dumps(data), content_type="application/json")
             else:
-                data["error"]="Nose ha ingresado nada s"
+                data["error"]="Nose ha ingresado nadas"
         except Exception as e:
             print(e)
        

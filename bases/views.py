@@ -4,7 +4,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from fac.models import FacturaEnc,FacturDet
 from inv.models import Producto
-from user.models import User
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse,HttpResponse,HttpResponseRedirect
 from django.db.models.functions import Coalesce
@@ -19,13 +18,12 @@ class LoginFormView(generic.FormView):
     template_name="bases/login.html"
     success_url=reverse_lazy("bases:casa")
     def dispatch(self,request,*args, **kwargs):
-        
+        print(request.user)
         if request.user.is_authenticated:
             return HttpResponseRedirect(self.success_url)
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self,form):
-  
         login(self.request,form.get_user())
         return HttpResponseRedirect(self.success_url)
 
@@ -62,7 +60,6 @@ class DashBoardView(LoginRequiredMixin,generic.TemplateView):
                 for user in User.objects.all():
                     total=FacturaEnc.objects.filter(uc=user.id,fecha__month=m).aggregate(r=Coalesce(Sum("total"),0)).get("r")           
                     data.append([user.id,m,float(total)])   
-         
         except Exception as e:
             print(e)
         return data
