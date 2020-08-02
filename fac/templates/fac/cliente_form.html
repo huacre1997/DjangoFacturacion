@@ -82,6 +82,7 @@
   {% block js_page %}
   <script>
     $("#form").on("submit", function (e) {
+      e.preventDefault()
       var id = $("#id").val()
       var nombre = $("#id_nombres").val()
       var apellido = $("#id_apellidos").val()

@@ -7,13 +7,13 @@
 
     <div class="card shadow">
       <!-- Card Header - Dropdown -->
-      <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary">Listado de Usuarios</h6>
-        <a class="btn btn-primary NewUser" href="{% url 'user:create_user' %}"><i
+      <div class="bg-gray-900 text-white card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold ">Listado de Usuarios</h6>
+        <a class="btn btn-primary NewUser" href="#"><i
             class="fa fa-plus-circle "></i>&nbsp;Nuevo usuario</a>
       </div>
       <!-- Card Body -->
-      <div class="card-body">
+      <div class="card-body ">
     
         <table class="table  table-hover dt-responsive" id="TablaUser" style="width: 100%;">
           <thead>
@@ -21,14 +21,13 @@
             <th class="all">Id</th>
             <th>Nombres</th>
             <th>Apellidos</th>
-            <th>Username</th>
-            <th>Fecha de registro</th>
+            <th>Usuario</th>
+            <th>Fecha</th>
             <th>Imagen</th>
+            <th>Rol</th>
             <th>Estado</th>
             <th>Opciones</th>
             </tr>
-            
-    
           </thead>
     
     
@@ -43,6 +42,7 @@
     <script>
         $(document).ready(function () {
             tabla = $("#TablaUser").DataTable({
+      processing: true,
      responsive:true,
       ajax: {
         url: "{% url 'user:userList' %}",
@@ -52,22 +52,90 @@
         },
         dataSrc: ""
       },
-      "lengthMenu": [
-        [5, 10, 25, 50, -1],
-        [5, 10, 25, 50, "All"]
+      lengthMenu: [
+            [ 5, 10, 50, -1 ],
+            [ '5 registros ', '10 registros', '50 registros', 'Mostrar Todos' ]
+        ],
+        lengthChange: false,
+      buttons: ["pageLength",
+
+         {
+           extend:"excelHtml5",
+           text:"<i class='fas fa-file-excel'></i>&nbsp;Exportar a Excel",
+           titleAttr:"excel",
+           className:"btn btn-success"
+         },
+         {
+           extend:"pdfHtml5",
+           text:"<i class='fas fa-file-pdf'></i>&nbsp;Exportar a PDF",
+           titleAttr:"PDF",
+           className:"btn btn-danger",
+           download:"open",
+           orientation:"landscape",
+           pageSize:"LEGAL",
+           customize: function(doc){
+             doc.styles={
+               header:{
+                 fontSize:18,
+                 bold:true,
+                 alignment:"center",
+               },
+               subheader:{
+                 fontSize:13,
+                 bold:true
+               },
+               quote:{
+                 italics:true  
+               },
+               small:{
+                 fontSize:8
+               },
+               tableHeader:{
+                 bold:true,
+                 fontSize:11,
+                 color:"white",
+                 fillColor:"#2d4154",
+                 alignment:"center"
+               }
+
+             };
+             doc.content[1].table.widths=["20%","20%","15%","15%","15%","15%"];
+             doc.content[1].margin=[0,35,0,0];
+             doc.content[1].layout={}; 
+             doc["footer"]=(function(page,pages){
+               return {
+                 columns:[
+                   {
+                   alignment:"left",
+                   text:["Fecha de creación",{text:date_now}]
+                   },
+                   {
+                   alignment:"right",
+                   text:["página",{text:page.toString()},"de",{text:pages.toString()}]
+                   }
+                 ],
+                 margin:20
+               }
+             })
+           }
+         }
       ],
       "language": {
+        buttons: {
+            pageLength: {
+                _: "Mostrar %d registros",
+                '-1': "Todos",
+            }
+        },
         "sSearch": "Buscar",
         "emptyTable": "No hay datos disponibles para esta tabla",
         "lengthMenu": "Mostrando _MENU_ entradas",
         "loadingRecords": "Cargando...",
-        "processing": "Procesando...",
+        "processing": '<div class="spinner-border text-primary" style="width: 3rem; height: 3rem; role="status"><span class="sr-only">Loading...</span></div>',
         "zeroRecords": "No se encontraron resultados",
         "info": "Mostrando _START_ al _END_ de _TOTAL_ entradas",
         "infoEmpty": "Mostrando 0 al 0 de 0 entradas",
-
-
-      },
+      },  
       "order": [
         [0, 'asc']
       ],
@@ -96,6 +164,17 @@
           }
         },
         {
+          "data": 'is_superuser',
+          className: "estado middle",
+          render: function (data, type, row) {
+            if (data) {
+              return "Administrador";
+            } else {
+              return "Usuario"
+            }
+          }
+        },
+        {
           "data": 'is_active',
           className: "estado middle",
           render: function (data, type, row) {
@@ -117,7 +196,7 @@
 
           render: function (row, data, index) {
             var buttons =
-              '<a  href="#" class="btn btn-warning btn-circle btnEdit mr-1" role="button" data-url="cliente/edit/' +
+              '<a  href="#" class="btn btn-warning btn-circle EditUser mr-1" role="button" data-url="cliente/edit/' +
               row.id +
               '"><i class="far fa-edit" ></i></a><a class="btn btn-success btn-circle" href="#" target="reportes"><i class="fas fa-thumbs-up"></i></a>';
 
@@ -136,7 +215,46 @@
 
         }
       },
+      initComplete: function (settings, json) {
+        $('.NewUser').attr("href","{% url 'user:create_user' %}")
+      
+        tabla.buttons().container().appendTo( '#TablaUser_wrapper .col-md-6:eq(0)' );
+       
+      }
+    });
+    $(document).on("click", ".EditUser", function (e) {
+      e.preventDefault()
+      var tr = tabla.cell($(this).closest("td")).index();
+      var data = tabla.row(tr.row).data();
 
+        de = $.confirm({
+        title: "Editar usuario",
+        content: "URL:edit/" + data.id,
+        columnClass: 'col-lg-8 col-md-10 col-sm-10 ',
+        icon: "fa fa-edit",
+        type: "orange",
+        theme:"material",
+        scrollToPreviousElement: false,
+
+        buttons: {
+          Confirm: {
+            text: 'Guardar cambios',
+            btnClass: 'btn-blue',
+
+            action: function url(e) {
+              
+              this.$content.find("#formUser").children("#btnEditUser").trigger('click');
+            
+              return false;
+          }
+          },
+          
+          cancel: function () {},
+        },
+    
+
+
+      });
     });
     $('.NewUser').on("click", function (e) {
       e.preventDefault()
@@ -144,9 +262,10 @@
       var jc = $.confirm({
         title: "Nuevo Usuario",
         content: "URL:new",
-        columnClass: 'col-lg-8 col-md-10 col-sm-10',
+        columnClass: 'col-lg-8 col-md-10 col-sm-10 ',
         icon: "fa fa-plus-circle",
-        type: "blue",
+        theme:"material", 
+        type:"blue",
         scrollToPreviousElement: false,
         buttons: {
           formSubmit: {

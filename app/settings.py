@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'cmp',
     'fac',
     "reports",
-    "user",
+    'user',
     "django_userforeignkey",
     "rest_framework",
     "tempus_dominus",

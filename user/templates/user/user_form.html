@@ -1,15 +1,15 @@
 {% if obj %}
-<form method="POST" id="form" class="needs-validation" novalidate enctype="multipart/form-data">
+<form method="POST" id="formUser" class="needs-validation" novalidate enctype="multipart/form-data">
 
   {% else %}
-  <form method="POST" id="form" class="needs-validation" novalidate enctype="multipart/form-data">
+  <form method="POST" id="formUser" class="needs-validation" novalidate enctype="multipart/form-data">
 
     {% endif %}
     {% csrf_token %}
 
     <input type="hidden" value="{% if obj %}edit{% else %}add{% endif %}" name="action">
 
-    <div class="card-body" style="padding:0 1rem;">
+    <div class="card-body" >
       <div class="form-row">
         <div class="form-group col-md-6">
           <label for="">Nombres:</label>
@@ -39,6 +39,18 @@
           </div>
         </div>
       </div>
+      <div class="form-group ">
+        <label for="">Correo:</label>
+        {{form.email}}
+
+        <div class="invalid-feedback">
+          {% if form.errors.email %}
+          {% for error in form.email.errors %}
+          {{ error }}
+          {% endfor %}
+          {% endif %}
+        </div>
+      </div>
       <div class="form-row">
         <div class="form-group col-md-6">
           <label for="">Usuario:</label>
@@ -56,9 +68,7 @@
         </div>
         <div class="form-group col-md-6">
           <label for="">Contraseña:</label>
-          <input value="{% if obj %}{{obj.password}}{% endif %}" type="password" name="password" id="id_password"
-            placeholder="Ingrese contraseña"
-            class="{% if form.errors.password %}form-control is-invalid{% else %}form-control{% endif %} " required>
+          {{form.password}}
 
           <div class="invalid-feedback">
             {% if form.errors.password %}
@@ -71,27 +81,71 @@
       </div>
       <div class="form-row">
         <div class="form-group col-md-6">
-          <label for="">Usuario activo:</label>
-          <input value="{% if obj %}{{obj.is_active}}{% endif %}" type="checkbox" name="is_active" id="id_is_active"
-            class="{% if form.errors.is_active %}form-control is-invalid{% else %}form-control{% endif %} " >
+          <label for="">Administrador:</label>
+          {{form.is_superuser}}
 
        
         </div>
         <div class="form-group col-md-6">
-          <label for="">Imagen:</label>
-          <input value="{% if obj %}{{obj.Image}}{% endif %}" type="file" name="Image" id="id_Image"
-            class="{% if form.errors.Image %}form-control is-invalid{% else %}form-control{% endif %} " >
+          <label for="">Usuario activo:</label>
+          {{form.is_active}}
 
-          <div class="invalid-feedback">
-            {% if form.errors.password %}
-            {% for error in form.password.errors %}
-            {{ error }}
-            {% endfor %}
-            {% endif %}
-          </div>
+       
+        </div>
+      
+      </div>
+      <div class="form-group ">
+        <label for="">Imagen:</label>
+        {{form.image}}
+
+        <div class="invalid-feedback">
+          {% if form.errors.Image %}
+          {% for error in form.Image.errors %}
+          {{ error }}
+          {% endfor %}
+          {% endif %}
         </div>
       </div>
-      <button type="submit" class="btn btn-primary" id="btnEdit" style="display:none">Submit</button>
 
     </div>
+    <input type="hidden" value="{{obj.pk}}" id="id">
+    <button type="submit" class="btn btn-primary" id="btnEditUser" style="display:none">Submit</button>
+
   </form>
+  {% block js_page %}
+  <script>
+    $("#btnEditUser").on("click", function (e) {
+      var id = $("#id").val()
+      
+      var paramaters=new FormData($('.needs-validation')[0])
+      $.ajax({
+        type: "POST",
+        url: "edit/" + id + "/",
+        data: paramaters,
+        dataType: "json",
+        processData: false,  // tell jQuery not to process the data
+        contentType: false,
+        success: function (data) {
+          if (data["stat"] == "ok") {
+            de.close()
+            mensaje("Usuario editado exitosamente.")
+          } else {
+            $("#formUser").html($(data["formUser"]).html())
+
+          
+            $(":text").keypress(function (e) {
+              $(this).removeClass("is-invalid")
+            });
+          }
+         tabla.ajax.reload()
+        }
+      }).done(function (data) {}).fail(function (jqXHR, textStatus, errorThrown) {
+                alert("done:" + textStatus + ': ' + errorThrown);
+              }).always(function (data) {
+
+              });;
+              return false;
+    });
+  </script>
+
+  {% endblock js_page %}

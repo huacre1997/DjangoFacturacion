@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser,BaseUserManager
 from django.conf import settings
 from django.forms import model_to_dict
-from django.contrib.auth.models import PermissionsMixin
 
 class User(AbstractUser):
     image=models.ImageField(upload_to="users/%Y/%m/%d",null=True,blank=True)
@@ -20,4 +19,8 @@ class User(AbstractUser):
     def save(self,*args, **kwargs):
         if self.pk is None:
             self.set_password(self.password)
+        else:
+            user=User.objects.get(pk=self.pk)
+            if user.password!=self.password:
+                self.set_password(self.password)
         super().save(*args, **kwargs)

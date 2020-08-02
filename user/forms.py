@@ -1,17 +1,28 @@
-from django import forms
-from  django.contrib.auth.models import User
+from django.forms import *
+from .models import  User
 from datetime import datetime
 from tempus_dominus.widgets import DatePicker,TimePicker,DateTimePicker
-class UserForm(forms.ModelForm):
-    first_name = forms.CharField( max_length=100,required=True)   
-    last_name = forms.CharField( max_length=100,required=True)   
-
+class UserForm(ModelForm):
+    first_name = CharField( max_length=100,required=True)   
+    last_name = CharField( max_length=100,required=True)   
     class Meta:
         model = User
-        
-
         exclude=["groups","user_permissions","last_login","date_joined"]
-     
+        widgets={
+            'email':EmailInput(attrs={
+                "name":"email",
+                "id":"email",
+                "placeholder":"Ingrese un correo electrónico",
+                'class': 'form-control',
+            }),
+            'password':PasswordInput(render_value=True,attrs={
+                "name":"password",
+                "id":"password",
+                "placeholder":"Contraseña",
+                'class': 'form-control',
+            })
+
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
