@@ -42,12 +42,12 @@ var graphCliente=Highcharts.chart('container3', {
     },
 
     xAxis: {
-        categories: {{empleado|safe}}
-    },
+    categories: {{empleado|safe}},
+  },
 
     yAxis: {
         categories: [
-            "0",
+           
             'Enero',
             'Febrero',
             'Marzo',
@@ -207,6 +207,7 @@ function get_graph_employees(){
         dataType: "json",
  
     }).done(function(data){
+        console.log(data)
         if(!data.hasOwnProperty("error")){
             graphCliente.addSeries({
                 name: 'Sales per employee',

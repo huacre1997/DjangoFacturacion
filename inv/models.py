@@ -30,7 +30,6 @@ class SubCategoria(ClaseModelo):
     def toJSON(self):
         item = model_to_dict(self)
         item['categoria'] = self.categoria.toJSON()
-
         return item
     def __str__(self):
         return "{}:{}".format(self.categoria.description, self.descripcion)

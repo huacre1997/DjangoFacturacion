@@ -22,7 +22,34 @@
 //     });
     
 //   });
-$(document).ready(function () {
- 
+$(function() {
+
+    var newHash      = "",
+        $mainContent = $("#main-content"),
+        $pageWrap    = $("body"),
+        baseHeight   = 0,
+        $el;
+        
+    $pageWrap.height($pageWrap.height());
+    baseHeight = $pageWrap.height() - $mainContent.height();
+    
+    $("#accordionSidebar").delegate("a", "click", function() {
+        window.location.hash = $(this).attr("href");
+        return false;
+    });
+    
+    $(window).bind('hashchange', function(){
+    
+        newHash = window.location.hash.substring(1);
+        
+        if (newHash) {
+            $mainContent
+                .find("#guts")
+                .fadeOut(200);
+        };
+        
+    });
+    
+    $(window).trigger('hashchange');
 
 });

@@ -189,7 +189,7 @@ class FacturaNew(LoginRequiredMixin,  generic.CreateView):
                     enc=FacturaEnc()
                     enc.fecha=vents["fecha"]
                     enc.cliente_id=vents["cliente"]
-                    enc.descuento=float(vents["descuento"])
+                    enc.igv=float(vents["igv"])
                     enc.sub_total=float(vents["subtotal"])
                     enc.save()
                     for i in vents["products"]:
@@ -239,7 +239,7 @@ class FacturaEdit(LoginRequiredMixin,  generic.UpdateView):
                     enc=self.get_object()
                     enc.fecha=vents["fecha"]
                     enc.cliente_id=vents["cliente"]
-                    enc.descuento=float(vents["descuento"])
+                    enc.igv=float(vents["igv"])
                     enc.sub_total=float(vents["subtotal"])
                     enc.save()
                     enc.facturdet_set.all().delete()

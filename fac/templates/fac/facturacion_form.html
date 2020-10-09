@@ -3,7 +3,7 @@
 {% block collapseVentas %}collapse show{% endblock collapseVentas %}
 {% block venta_new %}collapse-item active{% endblock venta_new %}
 {% block pagecontent %}
-<div id="modal" class="container-fluid">
+<div id="facForm" class="container-fluid">
     <h1 class="h3  text-gray-800"><i class="fa fa-plus-circle"></i>&nbsp;Nueva Venta</h1>
     <div class="card-body">
 
@@ -38,14 +38,14 @@
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-lg-3  col-4">
-                                    <label for="" class="">Descuento:&nbsp;&nbsp;</label>
+                                    <label for="" class="">IGV:&nbsp;&nbsp;</label>
 
 
 
                                     <div class="input-group">
 
-                                        <input type="number" class="form-control" name="descuento_detalle"
-                                            id="descuento_detalle" aria-label="Amount (to the nearest dollar)">
+                                        <input type="number" class="form-control" name="igv_detalle" value="18" readonly
+                                            id="igv_detalle" aria-label="Amount (to the nearest dollar)">
                                         <div class="input-group-append">
                                             <span class="input-group-text">%</span>
                                         </div>
@@ -147,9 +147,9 @@
                             </div>
                             <div class="form-group row">
 
-                                <label for="" class=" col-4 col-lg-5 col-form-label">Descuento:</label>
+                                <label for="" class=" col-4 col-lg-5 col-form-label">IGV:</label>
                                 <div class="col-8 col-lg-7">
-                                    {{ form.descuento }}
+                                    {{ form.igv }}
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -169,11 +169,7 @@
                 </div>
 
             </div>
-            <div class="row">
-
-
-            </div>
-
+         
         </form>
     </div>
 
@@ -189,22 +185,22 @@
         items: {
             cliente: "",
             fecha: "",
-            descuento: 0.00,
+            igv: 0.00,
             total: 0.00,
             subtotal: 0.00,
             products: [],
         },
         calculate: function () {
             var subtotal = 0.00
-            var descuento = $("#descuento_detalle").val()
+            var igv = $("#igv_detalle").val()
             $.each(this.items.products, function (pos, dict) {
                 dict.sub_total = dict.cantidad * parseFloat(dict.precio)
                 subtotal += dict.sub_total;
             });
             this.items.subtotal = subtotal
-            this.items.descuento = descuento * 0.01 * this.items.subtotal
-            this.items.total = this.items.subtotal - this.items.descuento
-            $("#descuento").val(this.items.descuento.toFixed(2))
+            this.items.igv = igv * 0.01 * this.items.subtotal
+            this.items.total = this.items.subtotal + this.items.igv
+            $("#igv").val(this.items.igv.toFixed(2))
 
             $("#sub_total").val(this.items.subtotal.toFixed(2))
             $("#total").val(this.items.total.toFixed(2))
@@ -365,7 +361,7 @@
 
     var searchproduct
 
-    $("#descuento_detalle").change(function (e) {
+    $("#igv_detalle").change(function (e) {
         vent.calculate()
 
     });
@@ -415,7 +411,7 @@
         language: "es",
         placeholder: "Seleccione cliente",
         allowClear: true,
-        dropdownParent: $('#modal'),
+        dropdownParent: $('#facForm'),
         selectionCssClass: "form-control",
         dropdownAutoWidth: "true",
         width: 'resolve',
@@ -599,7 +595,7 @@
         $("#descripcion").val("")
         $("#precio").val("")
         $("#cantidad").val(0)
-        $("#descuento_detalle").val("")
+
 
     }
     $("#cantidad").TouchSpin({
@@ -613,12 +609,12 @@
     vent.items.products = {{det | safe}} 
     {% endif %}
     vent.list()
-    // $("#cantidad,#precio,#descuento_detalle").change(function (e) {
+    // $("#cantidad,#precio,#igv_detalle").change(function (e) {
     //     calcular_Detalle()
     // });
     // $("#enc_cliente").val("{{enc.cliente.id}}").change()
     // $("#sub_total").val({{enc.sub_total}})
-    // $("#descuento").val({{enc.descuento}})
+    // $("#igv").val({{enc.igv}})
     // $("#total").val({{enc.total}})
 </script>
 {% endblock js_page %}

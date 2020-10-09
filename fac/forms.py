@@ -32,9 +32,9 @@ class FacturaEncForm(ModelForm):
 
                 }
             ),
-            'descuento': NumberInput(attrs={
-                "name":"descuento",
-                "id":"descuento",
+            'igv': NumberInput(attrs={
+                "name":"igv",
+                "id":"igv",
 
                 'readonly': True,
                 'class': 'form-control',

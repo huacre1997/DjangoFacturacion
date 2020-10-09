@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models.signals import post_save, post_delete
+from django.forms import model_to_dict
 
 from bases.models import ClaseModelo
 from inv.models import Producto
@@ -18,6 +19,11 @@ class Proovedor(ClaseModelo):
         super(Proovedor,self).save()
     class Meta:
         verbose_name_plural="Proveedores"
+    def toJSON(self):
+        item = model_to_dict(self)
+       
+
+        return item
 class ComprasEnc(ClaseModelo):
     fecha_compra=models.DateField(blank=True,null=True)
     observacion=models.TextField(blank=True,null=True)

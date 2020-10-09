@@ -6,6 +6,9 @@ from .models import *
 import json
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.template.loader import render_to_string
 
 from .forms import CategoriaForm, SubCategoriaForm, MarcaForm, ProductForm
 # Create your views here.
@@ -160,6 +163,22 @@ class ProductoView(LoginRequiredMixin, generic.ListView):
     template_name = "inv/product_list.html"
     context_object_name = "obj"
     login_url = "bases:login"
+    @method_decorator(csrf_exempt)
+    def dispatch(self,request,*args, **kwargs):
+        return super().dispatch(request,*args,**kwargs)
+    def post(self,request,*args, **kwargs):
+        data={}
+        try:
+            action=request.POST["action"]
+            if action=="searchData":
+                data=[]
+                for i in Producto.objects.all():
+                    data.append(i.toJSON())
+            else:
+                data["error"]="Ha ocurrido un error"
+        except Exception as e:
+            print(e)
+        return JsonResponse(data,safe=False)
 
 
 class ProductoNew(LoginRequiredMixin, generic.CreateView):
@@ -170,9 +189,25 @@ class ProductoNew(LoginRequiredMixin, generic.CreateView):
     success_url = reverse_lazy("inv:product_list")
     login_url = "bases:login"
 
-    def form_valid(self, form):
-        form.instance.createdUsu = self.request.user
-        return super().form_valid(form)
+
+    def post(self,request,*args, **kwargs):
+        data={}
+        action=request.POST["action"]
+        if action=="add":
+            form=ProductForm(request.POST)
+            if form.is_valid():
+                form.instance.createdUsu = self.request.user
+                form.save()
+                data = {
+                'stat': 'ok',
+                'form': render_to_string(self.template_name, {'form': form}, request=request)}
+                return JsonResponse(data)
+
+            else:
+                data = render_to_string(self.template_name,{'form': form}, request=request)
+                return HttpResponse(json.dumps(data), content_type="application/json")
+        else:
+            data["error"]="Nose ha ingresado nada s"
 
 
 class ProductoEdit(LoginRequiredMixin, generic.UpdateView):

@@ -23,4 +23,4 @@ class FacturaSerializer(serializers.ModelSerializer):
  
     class Meta:
         model=FacturaEnc
-        fields=('id','cliente','fc','sub_total','descuento','total',"estado")
+        fields=('id','cliente','fc','sub_total','igv','total',"estado")

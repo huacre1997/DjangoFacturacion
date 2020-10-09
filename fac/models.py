@@ -34,12 +34,12 @@ class FacturaEnc(ClaseModelo2):
     cliente=models.ForeignKey(Cliente,on_delete=models.CASCADE)
     fecha=models.DateField(default=datetime.now)
     sub_total=models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
-    descuento=models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
+    igv=models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     total=models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     def __str__(self):
         return "{}".format(self.id)
     def save(self):
-        self.total=self.sub_total-self.descuento
+        self.total=self.sub_total+self.igv
         super(FacturaEnc,self).save()
     class Meta:
         verbose_name = 'Factura'
@@ -48,7 +48,7 @@ class FacturaEnc(ClaseModelo2):
         item = model_to_dict(self)
         item['cliente'] = self.cliente.toJSON()
         item['sub_total'] = format(self.sub_total, '.2f')
-        item['descuento'] = format(self.descuento, '.2f')
+        item['igv'] = format(self.igv, '.2f')
         item['total'] = format(self.total, '.2f')
         item['fecha'] = self.fecha.strftime('%Y-%m-%d')
         item['det'] = [i.toJSON() for i in self.facturdet_set.all()]

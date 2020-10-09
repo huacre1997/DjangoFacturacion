@@ -15,3 +15,62 @@
 .nav-item .nav-link[data-toggle=collapse]:hover:after{
   color: white;
 }
+#modal{
+	width: 100%;
+	min-height: 100vh;
+	background: rgba(0,0,0,0.8);
+	position: fixed;
+	top: 0;
+	left: 0;
+  z-index: 1000000;
+  display: none; 
+
+}
+.modal2{
+
+  display: none; 
+
+ 
+}
+
+.modal--open{
+	width: 100%;
+	min-height: 100vh;
+	background: rgba(0,0,0,0.8);
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 1000000;
+  display: block; 
+
+} 
+.modal__content{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+}
+.modal__img{
+	width: 30%;
+}
+.modal__btn{
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	color: white;
+	cursor: pointer;
+	font-weight: bold;
+	width: 40px;
+	height: 40px;
+	line-height: 35px;
+	background: #DE423A;
+	font-size: 2.2em;
+	text-align: center;
+	font-family: monospace;
+	border-radius: 50%;
+		transition: all 0.5s;
+
+}
+.modal__btn:hover {
+	transform: scale(1.2);
+}

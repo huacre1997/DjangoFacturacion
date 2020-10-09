@@ -10,15 +10,32 @@ from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from cmp.forms import ProveedorForm,ComprasEncForm
 from inv.models import Producto
-
+import json
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.http import JsonResponse,HttpResponse,HttpResponseRedirect
+from django.template.loader import render_to_string
 
 class ProveedorView(LoginRequiredMixin, generic.ListView):
     template_name = "cmp/proveedor_list.html"
     login_url = "bases:login"
-
-    def get(self, request, *args, **kwargs):
-        obj = Proovedor.objects.all().order_by("id")
-        return render(request, self.template_name, {'obj': obj})
+    model=Proovedor
+    @method_decorator(csrf_exempt)
+    def dispatch(self,request,*args, **kwargs):
+        return super().dispatch(request,*args,**kwargs)
+    def post(self,request,*args, **kwargs):
+        data={}
+        try:
+            action=request.POST["action"]
+            if action=="searchData":
+                data=[]
+                for i in Proovedor.objects.all():
+                    data.append(i.toJSON())
+            else:
+                data["error"]="Ha ocurrido un error"
+        except Exception as e:
+            print(e)
+        return JsonResponse(data,safe=False)
 
 
 class ProveedorNew(SuccessMessageMixin,LoginRequiredMixin, generic.CreateView):
@@ -28,12 +45,26 @@ class ProveedorNew(SuccessMessageMixin,LoginRequiredMixin, generic.CreateView):
     form_class = ProveedorForm
     success_url = reverse_lazy("cmp:proveedor_list")
     login_url = "bases:login"
-    success_message="Proveedor creado exitosamente"
 
-    def form_valid(self, form):
-        form.instance.createdUsu = self.request.user
-        return super().form_valid(form)
-   
+
+    def post(self,request,*args, **kwargs):
+        data={}
+        action=request.POST["action"]
+        if action=="add":
+            form=ProveedorForm(request.POST)
+            if form.is_valid():
+                form.instance.createdUsu = self.request.user
+                form.save()
+                data = {
+                'stat': 'ok',
+                'form': render_to_string(self.template_name, {'form': form}, request=request)}
+                return JsonResponse(data)
+
+            else:
+                data = render_to_string(self.template_name,{'form': form}, request=request)
+                return HttpResponse(json.dumps(data), content_type="application/json")
+        else:
+            data["error"]="Nose ha ingresado nada s"
 
 class ProveedorEdit(SuccessMessageMixin,LoginRequiredMixin, generic.UpdateView):
     model = Proovedor

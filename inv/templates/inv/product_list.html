@@ -15,7 +15,7 @@
         </a>
         <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
           <div class="dropdown-header">Acciones</div>
-          <a class="dropdown-item" onclick="return abrir_modal('{% url 'inv:product_new' %}')" href="#"><i class="far fa-calendar-plus"></i>&nbsp;Nuevo producto</a>
+          <a class="dropdown-item btnNewProduct" href="#"><i class="far fa-calendar-plus"></i>&nbsp;Nuevo producto</a>
           <a class="dropdown-item" href="#">Another action</a>
           <div class="dropdown-divider"></div>
           <a class="dropdown-item" href="#">Something else here</a>
@@ -26,7 +26,7 @@
     <div class="card-body">
     
         
-        <table class="table tabled-striped table-hover">
+        <table class="table tabled-striped table-hover" id="tablaProductos">
             <thead>
                 <th>Sub.Cat.</th>
                 <th>Código</th>
@@ -40,7 +40,7 @@
             </thead>
             <tbody>
            
-                {% for item in obj  %}
+                <!-- {% for item in obj  %}
                 <tr>
                     <td>{{item.subcategoria}}</td>
                     <td>{{item.codigo}}</td>
@@ -56,7 +56,7 @@
 
                     </td>
                   </tr>
-                {% endfor %}
+                {% endfor %} -->
             </tbody>
         </table>
     </div>
@@ -66,8 +66,80 @@
 {% block js_page %}
   <script>
     $(document).ready(function () {
-      $(".table").DataTable({
+     var tablaProductos=$("#tablaProductos").DataTable({
         "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+        responsive:true,
+      ajax: {
+        url: "{% url 'inv:product_list' %}",
+        type: "POST",
+        data: {
+          "action": "searchData"
+        },
+        dataSrc: ""
+      },
+      columns: [{
+          "data": 'subcategoria.descripcion',className: "text-center middle",
+        },
+        {
+          "data": 'codigo',className: "middle"
+        },
+        {
+          "data": 'codigo_barra',className: "middle"
+        },
+        {
+          "data": 'descripcion',className: "middle"
+        },
+       
+        {
+          "data": 'stock',className: "middle"
+
+        },
+       
+        {
+          "data": 'marca.descripcion',className: "middle"
+
+        },
+        {
+          "data": 'estado',
+          className: "estado middle",
+          render: function (data, type, row) {
+            if (data) {
+              return "Activo";
+            } else {
+              return "Inactivo"
+            }
+          }
+        },
+        {
+          "data": 'estado',className:"text-center middle"
+        },
+
+
+      ],
+      columnDefs: [{
+          targets: [-1],
+
+          render: function (row, data, index) {
+            var buttons =
+              '<a  href="#" class="btn btn-warning btn-circle btnEdit mr-1" role="button" data-url="cliente/edit/' +
+              row.id +
+              '"><i class="far fa-edit" ></i></a><a class="btn btn-success btn-circle" href="#" target="reportes"><i class="fas fa-thumbs-up"></i></a>';
+
+            return buttons;
+
+          },
+
+        },
+
+
+      ],
+      "createdRow": function (row, data, index) {
+        if (!data["estado"]) {
+          $('.btn-success', row).eq(0).removeClass().addClass("btn btn-danger btn-circle")
+          $(".fa-thumbs-up", row).eq(0).removeClass().addClass("fas fa-thumbs-down")
+
+        }
+      },
         "language":{
           "sSearch":"Buscar",
           "emptyTable":"No hay datos disponibles para esta tabla",
@@ -79,6 +151,71 @@
 
         }
       });
+      $('.btnNewProduct').on("click", function (e) {
+      e.preventDefault()
+      var template = $(this).attr("data-url");
+      var jc = $.confirm({
+        title: "Nuevo Producto",
+        content: "URL:new",
+        columnClass: 'col-lg-8 col-md-8 col-sm-10',
+        icon: "fa fa-plus-circle",
+        type: "blue",
+        animateFromElement: true,
+        buttons: {
+          formSubmit: {
+            text: 'Registrar producto',
+            btnClass: 'btn-blue',
+            action: function () {
+           
+
+              form = this.$content.find('.formProduct')
+              $.ajax({
+                type: "POST",
+                url: "{% url 'inv:product_new' %}",
+                data: form.serialize(),
+                dataType: "json",
+                success: function (data) {
+
+                  if (data["stat"] == "ok") {
+                    mensaje("Producto registrado")
+                    jc.close()
+                   tablaProductos.ajax.reload()
+
+                  } else {
+                
+                    $("#formProduct").html($(data).html())
+                  
+                    $(":text").keypress(function (e) {
+                      $(this).removeClass("is-invalid")
+                    });
+
+                    // var go = ""
+                    // for (var [key, value] of Object.entries(data.error)) {
+                    //   go += '<br>' + value; // "a 5", "b 7", "c 9"
+                    // }
+                    // mensaje(go, "red")
+
+                  }
+                }
+
+              }).done(function (data) {}).fail(function (jqXHR, textStatus, errorThrown) {
+                alert("done:" + textStatus + ': ' + errorThrown);
+              }).always(function (data) {
+
+              });
+
+
+              return false;
+
+            }
+          },
+          cancel: function () {},
+        },
+
+
+      });
+
+    });
     });
   </script>
 {% endblock js_page %}

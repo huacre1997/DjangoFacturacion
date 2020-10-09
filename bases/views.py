@@ -13,6 +13,8 @@ from datetime import datetime
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login,authenticate,logout
+import json
+
 class LoginFormView(generic.FormView):
     form_class=AuthenticationForm
     template_name="bases/login.html"
@@ -24,7 +26,7 @@ class LoginFormView(generic.FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self,form):
-        login(self.request,form.get_user())
+        lo  gin(self.request,form.get_user())
         return HttpResponseRedirect(self.success_url)
 
 class LogoutView(generic.RedirectView):
@@ -56,10 +58,12 @@ class DashBoardView(LoginRequiredMixin,generic.TemplateView):
     def get_graph_empleado(self):
         data=[]
         try: 
-            for m in range(1,13):
+            for m in range(0,12):
                 for user in User.objects.all():
-                    total=FacturaEnc.objects.filter(uc=user.id,fecha__month=m).aggregate(r=Coalesce(Sum("total"),0)).get("r")           
-                    data.append([user.id,m,float(total)])   
+                    total=FacturaEnc.objects.filter(uc=user.id,fecha__month=m).aggregate(r=Coalesce(Sum("total"),0)).get("r") 
+                    
+                    data.append([user.id,m,float(total)])
+            print(data)
         except Exception as e:
             print(e)
         return data
@@ -93,13 +97,14 @@ class DashBoardView(LoginRequiredMixin,generic.TemplateView):
     def get_empleados(self):
         data=[]
         data.append("0")
+     
         for item in User.objects.all().order_by("id"):
             data.append(item.first_name)
-
         return data  
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["report_sales_year"] = self.get_graph_sales()
-        context["empleado"]=self.get_empleados()
+    def get_context_data(self,*args,**kwargs):
+        context=super().get_context_data(**kwargs)
+        # context["report_sales_year"] = self.get_graph_sales()
+        context["empleado"]=json.dumps(self.get_empleados())
+        print(context)
         return context
         

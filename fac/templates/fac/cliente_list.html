@@ -3,29 +3,23 @@
 {% block collapseVentas %}collapse show{% endblock collapseVentas %}
 {% block cliente %}collapse-item active{% endblock cliente %}
 {% block pagecontent %}
-<style>
-
-</style>
 <div class="container-fluid">
-
 <div class="card shadow">
   <!-- Card Header - Dropdown -->
-  <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+  <!-- <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
     <h6 class="m-0 font-weight-bold text-primary">Listado de Clientes</h6>
     <div class="dropdown no-arrow">
       <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
         aria-haspopup="true" aria-expanded="false">
         <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
       </a>
-      <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-        <div class="dropdown-header">Acciones</div>
-        <a class="dropdown-item NewClient" data-url="{% url 'fac:cliente_new' %}" href="#"><i
-            class="fa fa-plus-circle "></i>&nbsp;Nuevo Cliente</a>
-        <a class="dropdown-item" href="{% url 'cmp:compras_print_all' %}" target="reportes"><i
-            class="fas fa-print"></i>&nbsp;Imprimir listado</a>
-
-      </div>
+   
     </div>
+  </div> -->
+  <div class="card-header bg-gray-900 py-3 d-flex flex-row align-items-center justify-content-between">
+    <h6 class="m-0 font-weight-bold text-white">Listado de Clientes</h6>
+    <a class="btn btn-primary NewClient" href="#"><i
+        class="fa fa-plus-circle "></i>&nbsp;Nuevo cliente</a>
   </div>
   <!-- Card Body -->
   <div class="card-body">
@@ -41,12 +35,7 @@
         <th>Estado</th>
         <th class="all">Acciones</th>
         </tr>
-        
-
       </thead>
-
-
-
     </table>
   </div>
 </div>
@@ -55,9 +44,7 @@
 {% endblock pagecontent %}
 {% block js_page %}
 <script>
-
   $(document).ready(function () {
-
    tabla = $("#tablaCli").DataTable({
      responsive:true,
       ajax: {

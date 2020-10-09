@@ -10,30 +10,18 @@
     box-shadow: none !important;
   }
 </style>
+<div class="container-fluid">
 <div class="card shadow mb-4">
   <!-- Card Header - Dropdown -->
-  <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-    <h6 class="m-0 font-weight-bold text-primary">Listado de Proveedores</h6>
-    <div class="dropdown no-arrow">
-      <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
-        aria-haspopup="true" aria-expanded="false">
-        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-      </a>
-      <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-        <div class="dropdown-header">Acciones</div>
-        <a class="dropdown-item" onclick="return abrir_modal('{% url 'cmp:proveedor_new' %}')" href="#"><i
-            class="far fa-calendar-plus"></i>&nbsp;Nuevo proveedor</a>
-        <a class="dropdown-item" href="#">Another action</a>
-        <div class="dropdown-divider"></div>
-        <a class="dropdown-item" href="#">Something else here</a>
-      </div>
-    </div>
+  <div class="bg-gray-900 text-white card-header py-3 d-flex flex-row align-items-center justify-content-between">
+    <h6 class="m-0 font-weight-bold ">Listado de Proveedores</h6>
+    <a class="btn btn-primary btnNewProveedor" href="#"><i class="fa fa-plus-circle "></i>&nbsp;Nuevo proveedor</a>
   </div>
   <!-- Card Body -->
   <div class="card-body">
 
 
-    <table class="table tabled-striped table-hover" id="tablaProv">
+    <table class="table tabled-striped table-hover" id="tablaProveedores" style="width: 100%;">
       <thead>
         <th>Id</th>
         <th>Descripción</th>
@@ -45,7 +33,7 @@
 
         <th class="all">Acciones</th>
       </thead>
-      <tbody class="table-content">
+      <!-- <tbody class="table-content">
 
         {% for item in obj  %}
         <tr>
@@ -66,10 +54,10 @@
               data-toggle="desactivate" data-placement="top" title="Desactivar proveedor"><i class="fa fa-thumbs-down"
                 aria-hidden="true"></i></a>
 
-            {% else %}
+            {% else %} -->
             <!--<a href="#" onclick="return abrir_modal('{% url 'cmp:proveedor_active' item.id %}')"
               class="btn btn-success btn-circle " role="button"><i class="fa fa-thumbs-up" aria-hidden="true"></i></a>-->
-            <a href="#" data-url="{% url 'cmp:proveedor_active' item.id %}" name="{{item.descripcion}}"
+            <!-- <a href="#" data-url="{% url 'cmp:proveedor_active' item.id %}" name="{{item.descripcion}}"
               data-id="{{item.id}}" class="btn btn-success btn-circle btn-active" role="button" data-toggle="active"
               data-placement="top" title="Activar proveedor"><i class="fa fa-thumbs-up" aria-hidden="true"></i></a>
 
@@ -79,16 +67,258 @@
           </td>
         </tr>
         {% endfor %}
-      </tbody>
+      </tbody> -->
     </table>
   </div>
 </div>
-
+</div>
 {% endblock pagecontent %}
 {% block js_page %}
 <script>
   $(document).ready(function () {
+    tablaProveedor = $("#tablaProveedores").DataTable({
+      processing: true,
+      responsive: true,
+      ajax: {
+        url: "{% url 'cmp:proveedor_list' %}",
+        type: "POST",
+        data: {
+          "action": "searchData"
+        },
+        dataSrc: ""
+      },
+      lengthMenu: [
+        [5, 10, 50, -1],
+        ['5 ', '10 ', '50', 'Todos']
+      ],
+      lengthChange: true,
+      buttons: [
+      {
+          extend: "excelHtml5",
+          text: "<i class='fas fa-file-excel'></i>&nbsp;Exportar a Excel",
+          titleAttr: "excel",
+          className: "btn btn-success"
+        },
+     
+        {
+          extend: "pdfHtml5",
+          text: "<i class='fas fa-file-pdf'></i>&nbsp;Exportar a PDF",
+          titleAttr: "PDF",
+          className: "btn btn-danger",
+          download: "open",
+          orientation: "landscape",
+          pageSize: "LEGAL",
+         
+          customize: function (doc) {
+            doc.styles = {
+              header: {
+                fontSize: 18,
+                bold: true,
+                alignment: "center",
+              },
+              subheader: {
+                fontSize: 13,
+                bold: true
+              },
+              quote: {
+                italics: true
+              },
+              small: {
+                fontSize: 8
+              },
+              tableHeader: {
+                bold: true,
+                fontSize: 11,
+                color: "white",
+                fillColor: "#2d4154",
+                alignment: "center"
+              }
 
+            };
+            doc.content[1].table.widths = ["10%","10%", "20%", "15%", "15%" ,"10%", "10%","10%"];
+            doc.content[1].margin = [0, 35, 0, 0];
+            doc.content[1].layout = {};
+            doc["footer"] = (function (page, pages) {
+              return {
+                columns: [{
+                    alignment: "left",
+                    text: ["Fecha de creación:", {
+                      text: date_now
+                    }]
+                  },
+                  {
+                    alignment: "right",
+                    text: ["página", {
+                      text: page.toString()
+                    }, "de", {
+                      text: pages.toString()
+                    }]
+                  }
+                ],
+                margin: 20
+              }
+            })
+          }
+        },   {
+          extend: "print",
+          text: "<i class='fas fa-print'></i>&nbsp;Imprimir",
+          className: "btn btn-info"
+        },
+      ],
+      "language": {
+        buttons: {
+          pageLength: {
+            _: "Mostrar %d registros",
+            '-1': "Todos",
+          }
+        },
+        "sSearch": "Buscar",
+        "emptyTable": "No hay datos disponibles para esta tabla",
+        "lengthMenu": "Mostrar _MENU_ entradas",
+        "loadingRecords": "Cargando...",
+        "processing": '<div class="spinner-border text-primary" style="width: 3rem; height: 3rem; role="status"><span class="sr-only">Loading...</span></div>',
+        "zeroRecords": "No se encontraron resultados",
+        "info": "Mostrando _START_ al _END_ de _TOTAL_ entradas",
+        "infoEmpty": "Mostrando 0 al 0 de 0 entradas",
+      },
+      "order": [
+        [0, 'asc']
+      ],
+      columns: [{
+          "data": 'id',
+          className: "text-center middle",
+        },
+        {
+          "data": 'descripcion',
+          className: "middle"
+        },
+        {
+          "data": 'direccion',
+          className: "middle"
+        },
+        {
+          "data": 'contacto',
+          className: "middle"
+        },
+        {
+          "data": 'telefono',
+          className: "middle"
+
+        },
+        {
+          "data": 'email',
+          className: "middle"
+
+        },
+    
+        {
+          "data": 'estado',
+          className: "estado middle",
+          render: function (data, type, row) {
+            if (data) {
+              return "Activo";
+            } else {
+              return "Inactivo"
+            }
+          }
+        },
+        {
+          "data": 'id',
+          className: "text-center middle"
+        },
+
+
+      ],
+      columnDefs: [{
+          targets: [-1],
+
+          render: function (row, data, index) {
+            var buttons =
+              '<a  href="#" class="btn btn-warning btn-circle EditUser mr-1" role="button" data-url="proveedor/edit/' +
+              row.id +
+              '"><i class="far fa-edit" ></i></a><a class="btn btn-success btn-circle" href="#" target="reportes"><i class="fas fa-thumbs-up"></i></a>';
+
+            return buttons;
+
+          },
+
+        },
+
+
+      ],
+      "createdRow": function (row, data, index) {
+        if (!data["estado"]) {
+          $('.btn-success', row).eq(0).removeClass().addClass("btn btn-danger btn-circle")
+          $(".fa-thumbs-up", row).eq(0).removeClass().addClass("fas fa-thumbs-down")
+        }
+      },
+      initComplete: function (settings, json) {
+        $('.btnNewProveedor').attr("href", "{% url 'cmp:proveedor_new' %}")    
+        tablaProveedor.buttons().container().appendTo('#tablaProveedores_wrapper .col-md-6:eq(0)');     
+      
+
+
+
+      }
+    });
+    $('.btnNewProveedor').on("click", function (e) {
+      e.preventDefault()
+      var template = $(this).attr("data-url");
+      var jc = $.confirm({
+        title: "Nuevo Proveedor",
+        content: "URL:new",
+        columnClass: 'col-lg-8 col-md-10 col-sm-10 ',
+        icon: "fa fa-plus-circle",
+        theme: "material",
+        type: "blue",
+        scrollToPreviousElement: false,
+        buttons: {
+          formSubmit: {
+            text: 'Registrar Proveedor',
+            btnClass: 'btn-blue',
+            action: function () {
+              form = this.$content.find('.formProveedor')[0]
+              console.log(form)
+              var paramaters = new FormData(form)
+              $.ajax({
+                type: "POST",
+                url: "{% url 'cmp:proveedor_new' %}",
+                data: paramaters,
+                dataType: "json",
+                processData: false, // tell jQuery not to process the data
+                contentType: false,
+                success: function (data) {
+                  console.log(data)
+                  if (data["stat"] == "ok") {
+                    mensaje("Proveedor registrado")
+                    jc.close()
+                   tablaProveedor.ajax.reload()
+                  } else {
+                    $("#form").html($(data).html())
+                    $(":text").keypress(function (e) {
+                      $(this).removeClass("is-invalid")
+                    });
+                  }
+                }
+
+              }).done(function (data) {}).fail(function (jqXHR, textStatus, errorThrown) {
+                alert("done:" + textStatus + ': ' + errorThrown);
+              }).always(function (data) {
+
+              });
+
+
+              return false;
+
+            }
+          },
+          cancel: function () {},
+        },
+
+
+      });
+
+    });
     $('[data-toggle="active"]').tooltip({
       trigger: 'hover'
     })
@@ -195,7 +425,7 @@
               },
               success: function (response) {
                 $("#tablaProv").empty()
-                $("#tablaProv").html($(response).find("#tablaProv").html())
+                $("#tablaProveedores").html($(response).find("#tablaProveedores").html())
                 mensaje("Proovedor desactivado")
                 $('[data-toggle="active"]').tooltip({
       trigger: 'hover'
